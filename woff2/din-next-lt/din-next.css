@@ -1,0 +1,77 @@
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 100;
+    src: url('./DINNextLTPro-UltraLight.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 200;
+    src: url('./DINNextLTPro-Light.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 400;
+    src: url('./DINNextLTPro-Regular.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 500;
+    src: url('./DINNextLTPro-Medium.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 700;
+    src: url('./DINNextLTPro-Bold.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 800;
+    src: url('./DINNextLTPro-Heavy.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 900;
+    src: url('./DINNextLTPro-Black.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 100;
+    font-style: italic;
+    src: url('./DINNextLTPro-UltraLightIt.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 200;
+    font-style: italic;
+    src: url('./DINNextLTPro-LightItalic.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 400;
+    font-style: italic;
+    src: url('./DINNextLTPro-Italic.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 500;
+    font-style: italic;
+    src: url('./DINNextLTPro-MediumItalic.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 700;
+    font-style: italic;
+    src: url('./DINNextLTPro-BoldItalic.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 800;
+    font-style: italic;
+    src: url('./DINNextLTPro-HeavyItalic.ttf');
+}
+@font-face {
+    font-family: 'DIN Next LT';
+    font-weight: 900;
+    font-style: italic;
+    src: url('./DINNextLTPro-BlackItalic.ttf');
+}

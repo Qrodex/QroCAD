@@ -1,0 +1,19 @@
+* {
+    margin: 0;
+}
+:root {
+    --qroui-base-color: #1d1d1d;
+    --qroui-button-color: #2e2e2e;
+    --qroui-button-hover-color: #3a3a3a;
+    --qroui-button-active-color: #424242;
+    --qroui-button-disabled-color: #303030;
+    --qroui-base-text-color: #fff;
+}
+body {
+    font-family: 'DIN Next LT', sans-serif;
+    background-color: var(--qroui-base-color);
+    color: var(--qroui-base-text-color);
+}
+header {
+    padding: 15px;
+}
