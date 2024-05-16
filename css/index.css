@@ -1,6 +1,9 @@
 * {
     margin: 0;
+    font-family: 'DIN Next LT', sans-serif;
+    transition: all 0.5s ease;
 }
+
 :root {
     --qroui-base-color: #1d1d1d;
     --qroui-button-color: #2e2e2e;
@@ -9,14 +12,38 @@
     --qroui-button-disabled-color: #303030;
     --qroui-base-text-color: #fff;
 }
+
 body {
-    font-family: 'DIN Next LT', sans-serif;
     background-color: var(--qroui-base-color);
     color: var(--qroui-base-text-color);
 }
+
 header {
     padding: 15px;
     display: inline-flex;
     align-items: center;
     flex-direction: row;
+}
+
+#controls {
+    padding: 10px;
+}
+
+input[type=button] {
+    background: var(--qroui-button-color);
+    border: none;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    text-transform: capitalize;
+    cursor: pointer;
+    min-width: 25px;
+}
+
+input[type=button]:hover {
+    background: var(--qroui-button-hover-color);
+}
+
+input[type=button]:active {
+    background: var(--qroui-button-active-color);
 }
