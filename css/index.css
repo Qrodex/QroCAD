@@ -2,6 +2,7 @@
     margin: 0;
     font-family: 'DIN Next LT', sans-serif;
     transition: all 0.5s ease;
+    overflow: hidden;
 }
 
 :root {
