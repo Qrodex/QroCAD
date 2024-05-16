@@ -22,6 +22,7 @@
  * This class handle the graphical behaviour
  * of the CAD
  */
+var globalfps = 0
 function GraphicDisplay(displayName, width, height) {
 	// Enumerate all available modes
 	this.MODES = {
@@ -117,7 +118,7 @@ function GraphicDisplay(displayName, width, height) {
 	this.cvn = 0; // Canvas HTML element
 	this.context; // Canvas object
 
-	this.tooltipDefault = "WebCAD5"
+	this.tooltipDefault = "QroCAD Beta"
 	this.tooltip = this.tooltipDefault;
 
 	this.keyboard = null;
@@ -998,7 +999,7 @@ GraphicDisplay.prototype.setToolTip = function (text) {
 GraphicDisplay.prototype.getToolTip = function () {
 	var text = this.tooltip;
 
-	text += " | (" + this.getCursorXLocal() + "," + this.getCursorYLocal() + ")";
+	text += " (" + this.getCursorXLocal() + "," + this.getCursorYLocal() + ") " + `(${globalfps} FPS)`;
 
 	return text;
 };
@@ -1114,8 +1115,20 @@ var initCAD = function (gd) {
 		gd.performAction(e, gd.MOUSEACTION.UP);
 	});
 
+	var lastSecond = Date.now()
+	var fps = 0
+
 	// Start CAD
 	setInterval(function () {
+		var time = Date.now()
+		if (time - lastSecond > 1000) {
+			globalfps = fps
+			fps = 0
+			lastSecond = time
+		} else {
+			fps += 1
+		}
+
 		gd.execute();
-	}, 100);
+	}, 0);
 };
