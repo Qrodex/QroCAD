@@ -83,7 +83,8 @@ $(document).ready(function () {
         [fileHandle] = await window.showOpenFilePicker();
         const file = await fileHandle.getFile();
         const contents = await file.text();
-        gd.logicDisplay.components = JSON.parse(contents)
+        gd.logicDisplay.components = []
+        gd.logicDisplay.importJSON(JSON.parse(contents), gd.logicDisplay.components)
     });
 
     document.getElementById('gd_save').addEventListener('click', async () => {
