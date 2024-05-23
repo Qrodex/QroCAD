@@ -67,6 +67,7 @@ $(document).ready(function () {
         let undoStack = [];
         let redoStack = [];
         let lastArray = [...gd.logicDisplay.components];
+        let fileHandle;
         function checkForChanges() {
             if (gd.logicDisplay.components.length !== lastArray.length || gd.logicDisplay.components.some((value, index) => value !== lastArray[index])) {
                 undoStack.push([...lastArray]);
@@ -94,22 +95,32 @@ $(document).ready(function () {
         }
         $("#gd_redo").click(redo);
 
-        let fileHandle;
 
-        document.getElementById('gd_open').addEventListener('click', async () => {
+        function downloadFile() {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(gd.logicDisplay.components)));
+            element.setAttribute('download', 'Project.json');
+            element.click();
+        }
+        $("#gd_download").click(downloadFile);
+
+        async function openFile() {
             [fileHandle] = await window.showOpenFilePicker();
             const file = await fileHandle.getFile();
             const contents = await file.text();
             gd.logicDisplay.components = []
             gd.logicDisplay.importJSON(JSON.parse(contents), gd.logicDisplay.components)
-        });
+            document.getElementById("gd_save").style.display = "block"
+        }
+        $("#gd_open").click(openFile);
 
-        document.getElementById('gd_save').addEventListener('click', async () => {
+        async function saveFile() {
             if (fileHandle) {
                 const writable = await fileHandle.createWritable();
                 await writable.write(JSON.stringify(gd.logicDisplay.components));
                 await writable.close();
             }
-        });
+        }
+        $("#gd_save").click(openFile);
     }, 3000);
 });

@@ -3,6 +3,7 @@
 <head>
 	<link rel="stylesheet" href="css/index.css">
 	<link rel="stylesheet" href="woff2/fonts.css">
+	<link rel="stylesheet" href="woff2/din-next-lt/din-next.css">
 	<title>QroCAD</title>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
@@ -20,10 +21,17 @@
 <body>
 	<ul class="ul" id="controls">
 		<li class="dropdown li">
+			<a class="dropbtn">
+				<img src="assets/Qr.svg" style="width: 18px; margin-left: 3px;">
+			</a>
+		</li>
+
+		<li class="dropdown li">
 			<a class="dropbtn">File</a>
 			<div class="dropdown-content">
 				<a id="gd_blank"><i class="fa-regular fa-file"></i> New</a>
-				<a id="gd_save"><i class="fa-solid fa-floppy-disk"></i> Save</a>
+				<a id="gd_download"><i class="fa-solid fa-download"></i> Download</a>
+				<a id="gd_save" style="display: none;"><i class="fa-solid fa-floppy-disk"></i> Save</a>
 				<a id="gd_open"><i class="fa-solid fa-folder-open"></i> Open</a>
 			</div>
 		</li>
@@ -55,7 +63,7 @@
 		<li class="dropdown li">
 			<a class="dropbtn">Help</a>
 			<div class="dropdown-content">
-				<a><i class="fa-solid fa-circle-info"></i> QroCAD Beta 1.1</a>
+				<a><i class="fa-solid fa-circle-info"></i> QroCAD Beta 1.3</a>
 			</div>
 		</li>
 
@@ -66,16 +74,16 @@
 			<hr>
 		</button>
 
-		<button id="gd_navigate">
+		<button id="gd_navigate" title="Navigate">
 			<i class="fa-solid fa-arrow-pointer"></i>
 		</button>
-		<button id="gd_move">
+		<button id="gd_move" title="Move">
 			<i class="fa-solid fa-up-down-left-right"></i>
 		</button>
-		<button id="gd_edit">
+		<button id="gd_edit" title="Edit">
 			<i class="fa-solid fa-pen"></i>
 		</button>
-		<button id="gd_delete">
+		<button id="gd_delete" title="Delete">
 			<i class="fa-solid fa-trash"></i>
 		</button>
 
@@ -83,19 +91,19 @@
 			<hr>
 		</button>
 
-		<button id="gd_addpoint">
+		<button id="gd_addpoint" title="Add Point">
 			<i class="fa-solid fa-pen-nib"></i>
 		</button>
-		<button id="gd_addline">
+		<button id="gd_addline" title="Add Line">
 			<i class="fa-solid fa-minus" style="transform: rotate(-45deg);"></i>
 		</button>
-		<button id="gd_addcircle">
+		<button id="gd_addcircle" title="Add Circle">
 			<i class="fa-regular fa-circle"></i>
 		</button>
-		<button id="gd_addarc">
+		<button id="gd_addarc" title="Add Arc">
 			<i class="fa-solid fa-bezier-curve"></i>
 		</button>
-		<button id="gd_addrectangle">
+		<button id="gd_addrectangle" title="Add Rectangle">
 			<i class="fa-solid fa-vector-square"></i>
 		</button>
 
@@ -103,10 +111,10 @@
 			<hr>
 		</button>
 
-		<button id="gd_addmeasure">
+		<button id="gd_addmeasure" title="Measure">
 			<i class="fa-solid fa-ruler-combined"></i>
 		</button>
-		<button id="gd_addlabel">
+		<button id="gd_addlabel" title="Label">
 			<i class="fa-solid fa-tag"></i>
 		</button>
 
@@ -119,7 +127,7 @@
 		<div>
 			<img src="assets/qrocadlogo.svg" class="qrocadIntro"><br>
 			Starting client...
-			<span id="introver">VER_BETA_1.2</span>
+			<span id="introver">VER_BETA_1.3</span>
 			<img src="assets/qrodexvenom.png" class="qrodexlogo">
 			<span id="activationProgress"></span>
 		</div>
