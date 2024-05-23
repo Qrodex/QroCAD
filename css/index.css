@@ -1,9 +1,11 @@
 * {
     margin: 0;
+    padding: 0;
     font-family: 'DIN Next LT', sans-serif;
-    transition: all 0.5s ease;
     overflow: hidden;
     outline: none;
+    box-sizing: border-box;
+    user-select: none;
 }
 
 :root {
@@ -28,24 +30,107 @@ header {
 }
 
 #controls {
-    padding: 10px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
-input[type=button] {
+input[type=button],
+button {
     background: var(--qroui-button-color);
     border: none;
     color: white;
     padding: 5px;
-    border-radius: 5px;
-    text-transform: capitalize;
     cursor: pointer;
     min-width: 25px;
 }
 
-input[type=button]:hover {
+input[type=button]:hover,
+button:hover {
     background: var(--qroui-button-hover-color);
 }
 
-input[type=button]:active {
+input[type=button]:active,
+button:active {
     background: var(--qroui-button-active-color);
+}
+
+#sideButtons {
+    float: left;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+}
+
+#sideButtons button {
+    padding: 12px;
+    background: none;
+    font-size: 17px;
+}
+
+hr {
+    border-color: var(--qroui-button-color);
+}
+
+canvas {
+    float: right;
+    border-top: var(--qroui-button-color) solid 1px;
+    border-left: var(--qroui-button-color) solid 1px;
+}
+
+.li {
+    float: left;
+}
+
+.li a,
+.dropbtn {
+    color: white;
+    display: inline-block;
+    text-align: center;
+    padding: 12px;
+    text-decoration: none;
+}
+
+.li a:hover,
+.dropdown:hover .dropbtn {
+    background-color: var(--qroui-button-color);
+}
+
+.li.dropdown {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--qroui-button-color);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+.dropdown-content a:hover {
+    background-color: var(--qroui-button-hover-color);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+input {
+    color: white;
+    padding: 5px;
+    margin: 7px;
+    float: right;
+    background-color: var(--qroui-button-color);
+    border: var(--qroui-button-hover-color) solid 1px;
 }

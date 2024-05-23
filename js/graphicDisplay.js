@@ -1115,6 +1115,24 @@ var initCAD = function (gd) {
 		gd.performAction(e, gd.MOUSEACTION.UP);
 	});
 
+	gd.cvn.scroll(function (e) {
+		gd.mouse.onMouseUp(e);
+		gd.performAction(e, gd.MOUSEACTION.UP);
+	});
+
+	//handle mouse zooming
+	function zoomCanvas(e) {
+		if (e.ctrlKey) {
+			e.preventDefault()
+			if (e.deltaY < 0) {
+				gd.zoomIn();
+			} else {
+				gd.zoomOut();
+			}
+		}
+	}
+	gd.cvn[0].addEventListener('wheel', zoomCanvas);
+
 	var lastSecond = Date.now()
 	var fps = 0
 
