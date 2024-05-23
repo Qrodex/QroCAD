@@ -134,3 +134,58 @@ input {
     background-color: var(--qroui-button-color);
     border: var(--qroui-button-hover-color) solid 1px;
 }
+
+#loader {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    background: #1d1d1dab;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    place-items: center;
+}
+
+#loader div {
+    padding: 30px;
+    background: #2d2d2d;
+    border: #3d3d3d solid 1px;
+    color: #6d6d6d;
+    min-width: 30vw;
+    aspect-ratio: 16/9;
+    position: relative;
+    border-radius: 5px;
+}
+
+.qrocadIntro {
+    width: 10vw;
+    margin-bottom: 5px;
+}
+
+.qrodexlogo {
+    bottom: 0;
+    position: absolute;
+    display: block;
+    margin-bottom: 30px;
+    width: 5vw;
+}
+
+#activationProgress {
+    font-family: boot;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 30px;
+}
+
+#introver {
+    right: 0;
+    top: 0;
+    margin: 30px;
+    position: absolute;
+}
+
+@font-face {
+    font-family: boot;
+    src: url("../assets/boot.ttf");
+}

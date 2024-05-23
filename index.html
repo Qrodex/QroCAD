@@ -2,6 +2,7 @@
 
 <head>
 	<link rel="stylesheet" href="css/index.css">
+	<link rel="stylesheet" href="woff2/fonts.css">
 	<title>QroCAD</title>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
@@ -114,6 +115,15 @@
 		</button>
 	</div>
 	<canvas id="CADCanvas" width="1024" height="600" onContextMenu="javascript: return false;" tabindex="1"></canvas>
+	<div id="loader">
+		<div>
+			<img src="assets/qrocadlogo.svg" class="qrocadIntro"><br>
+			Starting client...
+			<span id="introver">VER_BETA_1.2</span>
+			<img src="assets/qrodexvenom.png" class="qrodexlogo">
+			<span id="activationProgress"></span>
+		</div>
+	</div>
 </body>
 
 </html>
