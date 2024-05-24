@@ -1,0 +1,26 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/node:14.17.4
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm i
+      - run:
+          name: Install dpkg and fakeroot
+          command: |
+            sudo apt-get update -y
+            sudo dpkg --add-architecture i386 && sudo apt-get update -y
+            sudo apt-get install -y dpkg fakeroot wine32 wine64 rpm
+      - run:
+          name: Generate Builds
+          command: npm run distCI
+      - run:
+          name: Delete foreign artifacts
+          command: cd dist && rm -rf win-unpacked && rm -rf win-ia32-unpacked && rm -rf linux-unpacked && cd ..
+
+      - store_artifacts:
+          path: ~/repo/dist

@@ -109,7 +109,7 @@ function GraphicDisplay(displayName, width, height) {
 	this.unitConversionFactor = 1 / 100;
 
 	// Snapping setting
-	this.snap = false;
+	this.snap = true;
 	this.snapTolerance = 10;
 
 	this.fontSize = 24;
@@ -118,7 +118,7 @@ function GraphicDisplay(displayName, width, height) {
 	this.cvn = 0; // Canvas HTML element
 	this.context; // Canvas object
 
-	this.tooltipDefault = "QroCAD Beta"
+	this.tooltipDefault = "QroCAD"
 	this.tooltip = this.tooltipDefault;
 
 	this.keyboard = null;
@@ -179,7 +179,7 @@ GraphicDisplay.prototype.clearGrid = function (e) {
 
 	this.context.translate(this.displayWidth / 2, this.displayHeight / 2);
 	this.context.strokeStyle = "#666";
-	this.context.lineWidth = 0.2;
+	this.context.lineWidth = 0.15;
 };
 
 GraphicDisplay.prototype.drawAllComponents = function (components, moveByX, moveByY) {
@@ -430,7 +430,7 @@ GraphicDisplay.prototype.drawMeasure = function (x1, y1, x2, y2, color, radius) 
 	this.drawLine(x1, y1, x2, y2, color, radius);
 
 	this.context.fillStyle = color;
-	this.context.font = (this.fontSize * localZoom) + "px sans-serif";
+	this.context.font = (this.fontSize * localZoom) + "px Torus";
 	this.context.fillText(
 		distance.toFixed(2) + "" + this.unitMeasure,
 		(this.cOutX + x2 - 120) * this.zoom,
@@ -450,7 +450,7 @@ GraphicDisplay.prototype.drawLabel = function (x, y, text, color, radius) {
 	}
 
 	this.context.fillStyle = color;
-	this.context.font = (this.fontSize * localZoom) + "px sans-serif";
+	this.context.font = (this.fontSize * localZoom) + "px Torus";
 
 	var maxLength = 24; // 24 Characters per row
 	var tmpLength = 0;
@@ -513,7 +513,7 @@ GraphicDisplay.prototype.drawToolTip = function () {
 	this.context.strokeRect(-this.displayWidth/2 + 1, this.displayHeight/2 - 21, this.displayWidth-2, 20);
 	*/
 	this.context.fillStyle = "#909090";
-	this.context.font = "16px sans-serif";
+	this.context.font = "16px Torus";
 	this.context.fillText(this.getToolTip(), -this.displayWidth / 2 + 3, this.displayHeight / 2 - 6);
 };
 
@@ -594,7 +594,7 @@ GraphicDisplay.prototype.drawGrid = function (camXoff, camYoff) {
  * @param e
  * @param action
  */
-GraphicDisplay.prototype.performAction = function (e, action) {
+GraphicDisplay.prototype.performAction = async function (e, action) {
 	switch (this.mode) {
 		case this.MODES.ADDPOINT:
 			this.cvn.css('cursor', 'default');
@@ -778,7 +778,7 @@ GraphicDisplay.prototype.performAction = function (e, action) {
 					this.temporaryPoints[1] = this.getCursorYLocal();
 				}
 			} else if (action == this.MOUSEACTION.DOWN) {
-				var text = prompt("Label:");
+				var text = await qroprompt("Label:");
 				if (text.length > 0) {
 					this.logicDisplay.addComponent(new Label(
 						this.temporaryPoints[0],
@@ -999,7 +999,7 @@ GraphicDisplay.prototype.setToolTip = function (text) {
 GraphicDisplay.prototype.getToolTip = function () {
 	var text = this.tooltip;
 
-	text += " (" + this.getCursorXLocal() + "," + this.getCursorYLocal() + ") " + `(${globalfps} FPS)`;
+	text += " (" + Math.floor(this.getCursorXLocal()) + "," + Math.floor(this.getCursorYLocal()) + ") " + `(${globalfps} FPS)`;
 
 	return text;
 };
@@ -1076,19 +1076,6 @@ var initCAD = function (gd) {
 
 	$(document).keydown(function (e) {
 		gd.keyboard.onKeyDown(e);
-	});
-
-	// Adding keyboard events 
-	gd.keyboard.addKeyEvent(true, gd.keyboard.KEYS.H, function () {
-		gd.logicDisplay.foo();
-	});
-
-	gd.keyboard.addKeyEvent(true, gd.keyboard.KEYS.I, function () {
-		gd.zoomIn();
-	});
-
-	gd.keyboard.addKeyEvent(true, gd.keyboard.KEYS.O, function () {
-		gd.zoomOut();
 	});
 
 	// Bind mouse events

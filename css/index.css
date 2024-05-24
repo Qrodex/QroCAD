@@ -1,7 +1,7 @@
 * {
-    margin: 0;
-    padding: 0;
-    font-family: 'Torus', sans-serif;
+    margin: 0px;
+    padding: 0px;
+    font-family: Torus, Torus;
     overflow: hidden;
     outline: none;
     box-sizing: border-box;
@@ -9,9 +9,9 @@
 }
 
 :root {
-    --qroui-base-color: #1d1d1d;
-    --qroui-button-color: #2e2e2e;
-    --qroui-button-hover-color: #3a3a3a;
+    --qroui-base-color: #2d2d2d;
+    --qroui-button-color: #1d1d1d;
+    --qroui-button-hover-color: #3d3d3d;
     --qroui-button-active-color: #424242;
     --qroui-button-disabled-color: #303030;
     --qroui-base-text-color: #fff;
@@ -31,12 +31,16 @@ header {
 
 #controls {
     list-style-type: none;
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
     overflow: hidden;
+    app-region: drag;
 }
 
-input[type=button],
+#controls input, #controls li {
+    app-region: no-drag;
+}
+
 button {
     background: var(--qroui-button-color);
     border: none;
@@ -44,16 +48,6 @@ button {
     padding: 5px;
     cursor: pointer;
     min-width: 25px;
-}
-
-input[type=button]:hover,
-button:hover {
-    background: var(--qroui-button-hover-color);
-}
-
-input[type=button]:active,
-button:active {
-    background: var(--qroui-button-active-color);
 }
 
 #sideButtons {
@@ -70,21 +64,21 @@ button:active {
 }
 
 hr {
-    border-color: var(--qroui-button-color);
+    border-color: var(--qroui-button-active-color);
+    border-style: solid;
 }
 
 canvas {
     float: right;
-    border-top: var(--qroui-button-color) solid 1px;
-    border-left: var(--qroui-button-color) solid 1px;
+    border-top: var(--qroui-button-hover-color) solid 1px;
+    border-left: var(--qroui-button-hover-color) solid 1px;
 }
 
 .li {
     float: left;
 }
 
-.li a,
-.dropbtn {
+.li a, .dropbtn {
     color: white;
     display: inline-block;
     text-align: center;
@@ -92,9 +86,8 @@ canvas {
     text-decoration: none;
 }
 
-.li a:hover,
-.dropdown:hover .dropbtn {
-    background-color: var(--qroui-button-color);
+.li a:hover, .dropdown:hover .dropbtn, button:hover {
+    background-color: var(--qroui-button-hover-color) !important;
 }
 
 .li.dropdown {
@@ -102,45 +95,55 @@ canvas {
     cursor: pointer;
 }
 
-.dropdown-content {
+#results {
+    right: 0px;
+    margin-right: calc(135px);
+    width: 20vw;
+    margin-top: -7px;
+    max-height: 75vh;
+    overflow: auto;
+}
+
+.dropdown-content, #results {
     display: none;
     position: absolute;
-    background-color: var(--qroui-button-color);
+    background-color: var(--qroui-button-hover-color);
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 16px 0px;
     z-index: 1;
 }
 
-.dropdown-content a {
+.dropdown-content a, #results a {
     padding: 10px;
     text-decoration: none;
     display: block;
     text-align: left;
 }
 
-.dropdown-content a:hover {
-    background-color: var(--qroui-button-hover-color);
+.dropdown-content a:hover, #results a:hover {
+    background-color: var(--qroui-button-active-color) !important;
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
 }
 
-input {
+ul input {
     color: white;
-    padding: 5px;
-    margin: 7px;
+    padding: 6.5px;
+    margin: 6px;
     float: right;
-    background-color: var(--qroui-button-color);
+    background-color: #202020;
     border: var(--qroui-button-hover-color) solid 1px;
+    min-width: 20vw;
 }
 
 #loader {
     width: 100vw;
     height: 100vh;
     position: absolute;
-    background: #1d1d1dab;
-    top: 0;
+    background: rgba(29, 29, 29, 0.67);
+    top: 0px;
     display: flex;
     justify-content: center;
     place-items: center;
@@ -148,11 +151,11 @@ input {
 
 #loader div {
     padding: 30px;
-    background: #2d2d2d;
-    border: #3d3d3d solid 1px;
-    color: #6d6d6d;
+    background: rgb(45, 45, 45);
+    border: 1px solid rgb(61, 61, 61);
+    color: rgb(109, 109, 109);
     min-width: 30vw;
-    aspect-ratio: 16/9;
+    aspect-ratio: 16 / 9;
     position: relative;
     border-radius: 5px;
 }
@@ -163,7 +166,7 @@ input {
 }
 
 .qrodexlogo {
-    bottom: 0;
+    bottom: 0px;
     position: absolute;
     display: block;
     margin-bottom: 30px;
@@ -173,14 +176,14 @@ input {
 #activationProgress {
     font-family: boot;
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 0px;
+    right: 0px;
     margin: 30px;
 }
 
 #introver {
-    right: 0;
-    top: 0;
+    right: 0px;
+    top: 0px;
     margin: 30px;
     position: absolute;
 }
@@ -188,4 +191,26 @@ input {
 @font-face {
     font-family: boot;
     src: url("../assets/boot.ttf");
+}
+
+.system {
+    font-size: 12px;
+    height: 43px;
+    aspect-ratio: 1 / 1;
+    float: right;
+}
+
+.system a {
+    display: flex;
+    justify-content: center;
+    place-items: center;
+    height: 100%;
+    font-size: 9px;
+    transition: all 0.1s ease 0s;
+}
+
+@media only screen and (max-width: 1000px) {
+    #loader div {
+        min-width: 40vw;
+    }
 }
