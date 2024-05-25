@@ -102,6 +102,8 @@ function GraphicDisplay(displayName, width, height) {
 	this.gridPointer = false;
 	this.gridSpacing = 100; // Pixel
 
+	this.showTooltip = true;
+
 	this.conversionFactor = 1;
 	this.unitName = "px";
 	this.unitMeasure = "m";
@@ -1000,6 +1002,10 @@ GraphicDisplay.prototype.getToolTip = function () {
 	var text = this.tooltip;
 
 	text += " (" + Math.floor(this.getCursorXLocal()) + "," + Math.floor(this.getCursorYLocal()) + ") " + `(${globalfps} FPS)`;
+
+	if (!this.showTooltip) {
+		text = ''
+	}
 
 	return text;
 };

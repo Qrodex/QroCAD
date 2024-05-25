@@ -68,6 +68,7 @@ async function qroprompt(question) {
 }
 
 //main app
+var gd
 $(document).ready(function () {
     var things = ''
     let i = 0
@@ -130,7 +131,7 @@ $(document).ready(function () {
         }
         $("#gd_png").click(canvas2png)
 
-        var gd = new GraphicDisplay("CADCanvas", 800, 600);
+        gd = new GraphicDisplay("CADCanvas", 800, 600);
         resizeCanvas()
         setInterval(resizeCanvas, 10)
         gd.unitMeasure = "m";

@@ -214,3 +214,11 @@ ul input {
         min-width: 40vw;
     }
 }
+
+input[type=checkbox] {
+    min-width: 13px;
+    margin: 0;
+    margin-top: 3px;
+    accent-color: var(--qroui-button-active-color);
+    cursor: pointer;
+}
