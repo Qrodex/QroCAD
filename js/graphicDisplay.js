@@ -127,6 +127,10 @@ function GraphicDisplay(displayName, width, height) {
 	this.mouse = null;
 }
 
+GraphicDisplay.prototype.lerp = function(a, b, t) {
+	return a + (b - a) * t
+}
+
 GraphicDisplay.prototype.init = function () {
 	/*
 	 * INITIALIZE THE LOGIC
@@ -147,6 +151,8 @@ GraphicDisplay.prototype.init = function () {
 
 GraphicDisplay.prototype.execute = function () {
 	this.offsetX = this.cvn.offset().left;
+	this.currentZoom = this.lerp(this.currentZoom, this.targetZoom, 0.1)
+	this.zoom = this.currentZoom
 	this.offsetY = this.cvn.offset().top;
 
 	this.updateCamera();
@@ -967,7 +973,7 @@ GraphicDisplay.prototype.setZoom = function (zoomFactor) {
 	if (newZoom == 0.125 || newZoom == 4)
 		return;
 
-	this.zoom = newZoom;
+	this.targetZoom = newZoom;
 };
 
 GraphicDisplay.prototype.zoomIn = function () {
