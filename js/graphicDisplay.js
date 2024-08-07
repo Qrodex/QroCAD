@@ -87,6 +87,8 @@ function GraphicDisplay(displayName, width, height) {
 	this.zoom = 0.5;
 	this.zoomin = 2;
 	this.zoomout = 0.5;
+	this.currentZoom = 1; // Add this to your initialization
+    this.targetZoom = 1;  // Add this to your initialization
 	this.camMoving = false;
 	this.xCNaught = 0;
 	this.yCNaught = 0;
