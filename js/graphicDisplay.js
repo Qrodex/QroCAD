@@ -440,7 +440,7 @@ GraphicDisplay.prototype.drawMeasure = function (x1, y1, x2, y2, color, radius) 
 	this.drawLine(x1, y1, x2, y2, color, radius);
 
 	this.context.fillStyle = color;
-	this.context.font = (this.fontSize * localZoom) + "px Torus";
+	this.context.font = (this.fontSize * localZoom) + "px Newstroke";
 	this.context.fillText(
 		distance.toFixed(2) + "" + this.unitMeasure,
 		(this.cOutX + x2 - 120) * this.zoom,
@@ -460,7 +460,7 @@ GraphicDisplay.prototype.drawLabel = function (x, y, text, color, radius) {
 	}
 
 	this.context.fillStyle = color;
-	this.context.font = (this.fontSize * localZoom) + "px Torus";
+	this.context.font = (this.fontSize * localZoom) + "px Newstroke";
 
 	var maxLength = 24; // 24 Characters per row
 	var tmpLength = 0;
@@ -523,7 +523,7 @@ GraphicDisplay.prototype.drawToolTip = function () {
 	this.context.strokeRect(-this.displayWidth/2 + 1, this.displayHeight/2 - 21, this.displayWidth-2, 20);
 	*/
 	this.context.fillStyle = "#909090";
-	this.context.font = "16px Torus";
+	this.context.font = "11px Newstroke";
 	this.context.fillText(this.getToolTip(), -this.displayWidth / 2 + 3, this.displayHeight / 2 - 6);
 };
 
@@ -969,10 +969,10 @@ GraphicDisplay.prototype.resetMode = function () {
 };
 
 GraphicDisplay.prototype.setZoom = function (zoomFactor) {
-	var newZoom = this.zoom * zoomFactor;
+	var newZoom = this.currentZoom * zoomFactor;
 
 	// Zoom interval control
-	if (newZoom == 0.125 || newZoom == 4)
+	if ( newZoom <= 0.4 || newZoom >= 4 )
 		return;
 
 	this.targetZoom = newZoom;
@@ -1120,6 +1120,16 @@ var initCAD = function (gd) {
 		gd.mouse.onMouseUp(e);
 		gd.performAction(e, gd.MOUSEACTION.UP);
 	});
+	gd.cvn.on('wheel', (event) => {
+		let zoomFactor = 1
+        if (event.originalEvent.deltaY < 0) {
+            gd.zoomIn()
+        } else {
+            gd.zoomOut()
+        }
+        console.log(`Zoom factor: ${zoomFactor}`);
+        event.preventDefault();
+    });
 
 	//handle mouse zooming
 	function zoomCanvas(e) {

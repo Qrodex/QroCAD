@@ -36,3 +36,7 @@ Unleash the venom.
     font-weight: 900;
     src: url('./torus-heavy.woff2');
 }
+@font-face {
+    font-family: 'Newstroke';
+    src: url('./newstroke.ttf');
+}
