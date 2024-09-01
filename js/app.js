@@ -233,6 +233,12 @@ $(document).ready(function () {
                             "qrocad/*": [".json", ".qrocad"],
                         },
                     },
+                    {
+                        description: "CompassCAD Design File",
+                        accept: {
+                            "ccad/*": [".ccad"],
+                        },
+                    },
                 ],
                 excludeAcceptAllOption: false,
                 multiple: false,
