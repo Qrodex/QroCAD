@@ -850,7 +850,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 			this.tooltip = "Move";
 			break;
 		case this.MODES.EDIT:
-			// TODO: In the next release
+			// TODO: In the next release 
 			this.tooltip = "Edit";
 			break;
 		case this.MODES.DELETE:
