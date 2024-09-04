@@ -67,6 +67,16 @@ async function qroprompt(question) {
     }
 }
 
+//copy text on click
+function copy(that) {
+    var inp = document.createElement('input');
+    document.body.appendChild(inp)
+    inp.value = that
+    inp.select();
+    document.execCommand('copy', false);
+    inp.remove();
+}
+
 //main app
 var gd
 $(document).ready(function () {
@@ -181,9 +191,17 @@ $(document).ready(function () {
         let fileHandle;
         function checkForChanges() {
             if (gd.logicDisplay.components.length !== lastArray.length || gd.logicDisplay.components.some((value, index) => value !== lastArray[index])) {
-                undoStack.push([...lastArray]);
-                redoStack.length = 0;
-                lastArray = [...gd.logicDisplay.components];
+                if (!peerChange) {
+                    undoStack.push([...lastArray]);
+                    redoStack.length = 0;
+                    lastArray = [...gd.logicDisplay.components];
+                    sendCurrEditor()
+                } else {
+                    undoStack.push([...lastArray]);
+                    redoStack.length = 0;
+                    lastArray = [...gd.logicDisplay.components];
+                    peerChange = false
+                };
             }
         }
         setInterval(checkForChanges, 1000);

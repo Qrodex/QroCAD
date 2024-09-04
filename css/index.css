@@ -147,12 +147,12 @@ canvas {
 
 ul input {
     color: white;
-    padding: 6.5px;
+    padding: 8px;
     margin: 6px;
     float: right;
     background-color: #202020;
     border: none;
-    border-radius: 10px;
+    border-radius: 5px;
     min-width: 20vw;
 }
 

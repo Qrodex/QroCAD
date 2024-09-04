@@ -843,6 +843,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 				if (this.selectedComponent == null) {
 					this.selectComponent(this.temporarySelectedComponent);
 				} else {
+					sendCurrEditor()
 					this.unselectComponent();
 				}
 			}
@@ -863,6 +864,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 			} else if (action == this.MOUSEACTION.DOWN) {
 				if (this.temporarySelectedComponent != null) {
 					this.logicDisplay.components[this.temporarySelectedComponent].setActive(false);
+					sendCurrEditor()
 				}
 			}
 			this.tooltip = "Delete";

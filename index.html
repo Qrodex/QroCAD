@@ -10,6 +10,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
 	<script src="js/deps/fa.js"></script>
+	<script src="js/deps/peer.js"></script>
 
 	<script src="js/component.js"></script>
 	<script src="js/customShapes.js"></script>
@@ -17,6 +18,7 @@
 	<script src="js/logicDisplay.js"></script>
 	<script src="js/graphicDisplay.js"></script>
 	<script src="js/app.js" defer></script>
+	<script src="js/collabEdit.js" defer></script>
 </head>
 
 <body>
@@ -65,12 +67,20 @@
 		</li>
 
 		<li class="dropdown li">
-			<a class="dropbtn">Help</a>
+			<a class="dropbtn">Collab</a>
 			<div class="dropdown-content">
-				<a><i class="fa-solid fa-circle-info"></i> QroCAD Beta 1.5</a>
+				<a id="myID"><i class="fa-solid fa-hourglass"></i> Loading ID...</a>
+				<a onclick="startCollab()"><i class="fa-solid fa-link"></i> Connect</a>
 			</div>
 		</li>
 
+		<li class="dropdown li">
+			<a class="dropbtn">Help</a>
+			<div class="dropdown-content">
+				<a><i class="fa-solid fa-circle-info"></i> QroCAD Beta 1.6</a>
+			</div>
+		</li>
+		
 		<div class="rightwing">
 			<li class="dropdown li system" id="closeApp">
 				<a class="dropbtn"><i class="icon icon-fw icon-chrome-close"></i></a>
@@ -165,7 +175,7 @@
 		<div>
 			<img src="assets/qrocadlogo.svg" class="qrocadIntro"><br>
 			Starting client...
-			<span id="introver">VER_BETA_1.5</span>
+			<span id="introver">VER_BETA_1.6</span>
 			<img src="assets/qrodexvenom.png" class="qrodexlogo">
 			<span id="activationProgress"></span>
 		</div>
