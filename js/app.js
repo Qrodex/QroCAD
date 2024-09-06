@@ -77,6 +77,14 @@ function copy(that) {
     inp.remove();
 }
 
+
+var versionspan = document.getElementById("spanversion")
+async function setVersionManual() {
+    const fetchpackage = await fetch("package.json")
+    const packagejson = await fetchpackage.json()
+    versionspan.innerText = (packagejson.version)
+}
+
 //main app
 var gd
 $(document).ready(function () {
@@ -350,6 +358,8 @@ $(document).ready(function () {
         document.getElementById("extra-desktop").onclick = function () {
             open("https://github.com/Qrodex/QroCAD/releases", "_blank");
         }
+
+        setVersionManual()
     } else {
         document.getElementById("extra-separator").style.display = "none"
         document.getElementById("extra-desktop").style.display = "none"
@@ -362,6 +372,8 @@ $(document).ready(function () {
         const getWindow = () => remote.BrowserWindow.getFocusedWindow();
         const window = getWindow();
         var lastWindowState = 'win'
+
+        versionspan.innerText = app.getVersion()
 
         function closeWindow() {
             getWindow().close();

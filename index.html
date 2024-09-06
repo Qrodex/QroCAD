@@ -45,6 +45,7 @@
 			<div class="dropdown-content">
 				<a id="gd_zoomout"><i class="fa-solid fa-magnifying-glass-minus"></i> Zoom Out</a>
 				<a id="gd_zoomin"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</a>
+				<a id="gd_zoomin"><i class="fa-solid fa-up-right-and-down-left-from-center"></i> Smooth Zoom <input type="checkbox" onclick="gd.enableLerping = this.checked" id="showTooltip"></a>
 				<a id="gd_zoomin"><i class="fa-solid fa-font"></i> Show Tooltip <input type="checkbox" onclick="gd.showTooltip = this.checked" id="showTooltip" checked></a>
 				<a id="gd_zoomin"><i class="fa-solid fa-hashtag"></i> Show Grid <input type="checkbox" onclick="gd.showGrid = this.checked" id="showGrid" checked></a>
 			</div>
@@ -70,14 +71,15 @@
 			<a class="dropbtn">Collab</a>
 			<div class="dropdown-content">
 				<a id="myID"><i class="fa-solid fa-hourglass"></i> Loading ID...</a>
-				<a onclick="startCollab()"><i class="fa-solid fa-link"></i> Connect</a>
+				<a onclick="startCollab()" id="connectbtn"><i class="fa-solid fa-link"></i> Connect</a>
+				<a id="connected" style="display: none;"><i class="fa-solid fa-square-check"></i> Connected!</a>
 			</div>
 		</li>
 
 		<li class="dropdown li">
 			<a class="dropbtn">Help</a>
 			<div class="dropdown-content">
-				<a><i class="fa-solid fa-circle-info"></i> QroCAD Beta 1.6</a>
+				<a><i class="fa-solid fa-circle-info"></i> QroCAD Beta <span id="spanversion">0.0.0</span></a>
 			</div>
 		</li>
 		
@@ -103,7 +105,7 @@
 
 		<a class="item-search" id="query_nav">Navigate Tool</a>
 		<a class="item-search" id="query_move">Move Tool</a>
-		<a class="item-search" id="query_edit">Edit Tool</a>
+		<!-- <a class="item-search" id="query_edit">Edit Tool</a> -->
 		<a class="item-search" id="query_delete">Delete Tool</a>
 
 		<a class="item-search" id="query_addpoint">Add Point</a>
@@ -124,9 +126,9 @@
 		<button id="gd_move" title="Move">
 			<i class="fa-solid fa-up-down-left-right"></i>
 		</button>
-		<button id="gd_edit" title="Edit">
+		<!-- <button id="gd_edit" title="Edit">
 			<i class="fa-solid fa-pen"></i>
-		</button>
+		</button> -->
 		<button id="gd_delete" title="Delete">
 			<i class="fa-solid fa-trash"></i>
 		</button>
@@ -175,7 +177,7 @@
 		<div>
 			<img src="assets/qrocadlogo.svg" class="qrocadIntro"><br>
 			Starting client...
-			<span id="introver">VER_BETA_1.6</span>
+			<span id="introver"></span>
 			<img src="assets/qrodexvenom.png" class="qrodexlogo">
 			<span id="activationProgress"></span>
 		</div>

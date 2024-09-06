@@ -56,6 +56,8 @@ function GraphicDisplay(displayName, width, height) {
 
 	this.previousColor = null;
 	this.previousRadius = null;
+	
+	this.enableLerping = false
 
 	// The index of temporary selected component
 	this.temporarySelectedComponent = null;
@@ -153,9 +155,14 @@ GraphicDisplay.prototype.init = function () {
 
 GraphicDisplay.prototype.execute = function () {
 	this.offsetX = this.cvn.offset().left;
-	this.currentZoom = this.lerp(this.currentZoom, this.targetZoom, 0.1)
 	this.zoom = this.currentZoom
 	this.offsetY = this.cvn.offset().top;
+
+	if (this.enableLerping) {
+		this.currentZoom = this.lerp(this.currentZoom, this.targetZoom, 0.1)
+	} else {
+		this.currentZoom = this.targetZoom
+	}
 
 	this.updateCamera();
 

@@ -1,45 +1,40 @@
-
 //generate p2p id
-var peer
 var conn
 var peerChange = false
-function join() {
-    peer = new Peer();
+var peer = new Peer();
 
-    peer.on('open', function (id) {
-        var idButton = document.getElementById("myID")
-        idButton.innerHTML = `<i class="fa-solid fa-clipboard-list"></i> ${id}`
+peer.on('open', function (id) {
+    var idButton = document.getElementById("myID")
+    idButton.innerHTML = `<i class="fa-solid fa-clipboard-list"></i> ${id}`
 
-        idButton.onclick = function () {
-            copy(id)
-            idButton.innerHTML = `<i class="fa-solid fa-clipboard-check"></i> ${id}`
-            setTimeout(() => {
-                idButton.innerHTML = `<i class="fa-solid fa-clipboard-list"></i> ${id}`
-            }, 1000);
-        }
-    });
+    idButton.onclick = function () {
+        copy(id)
+        idButton.innerHTML = `<i class="fa-solid fa-clipboard-check"></i> ${id}`
+        setTimeout(() => {
+            idButton.innerHTML = `<i class="fa-solid fa-clipboard-list"></i> ${id}`
+        }, 1000);
+    }
+});
 
-    peer.on('connection', function (c) {
-        conn = c;
+peer.on('connection', function (c) {
+    conn = c;
 
-        conn.on('open', function () {
-            conn.on('data', function (data) {
-                if (data.type === 'handshake') {
-                    const autoConn = peer.connect(data.peerId);
-                    autoConn.on('open', function () {
-                        autoConn.on('data', function (data) {
-                            updateEditor(data);
-                        });
-                        conn = autoConn;
+    conn.on('open', function () {
+        conn.on('data', function (data) {
+            if (data.type === 'handshake') {
+                const autoConn = peer.connect(data.peerId);
+                autoConn.on('open', function () {
+                    autoConn.on('data', function (data) {
+                        updateEditor(data);
                     });
-                } else {
-                    updateEditor(data);
-                }
-            });
+                    conn = autoConn;
+                });
+            } else {
+                updateEditor(data);
+            }
         });
     });
-}
-join()
+});
 
 //update editor
 function updateEditor(content) {
@@ -71,7 +66,17 @@ async function startCollab() {
 //send current editor
 function sendCurrEditor() {
     if (conn && conn.open) {
-        console.log('sent')
         conn.send(JSON.stringify(gd.logicDisplay.components));
     }
 }
+
+//hide connect button when connected
+setInterval(() => {
+    if (conn && conn.open) {
+        document.getElementById("connectbtn").style.display = 'none'
+        document.getElementById("connected").style.display = 'block'
+    } else {
+        document.getElementById("connectbtn").style.display = 'block'
+        document.getElementById("connected").style.display = 'none'
+    }
+});
