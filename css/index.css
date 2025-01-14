@@ -7,11 +7,13 @@
     box-sizing: border-box;
     user-select: none;
 }
+
 @keyframes fadedown {
     0% {
         opacity: 0;
         transform: translateY(-50px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0px);
@@ -48,12 +50,14 @@ header {
     overflow: hidden;
     app-region: drag;
 }
+
 .rightwing {
     margin-left: auto;
     order: 2;
 }
 
-#controls input, #controls li {
+#controls input,
+#controls li {
     app-region: no-drag;
 }
 
@@ -94,7 +98,8 @@ canvas {
     float: left;
 }
 
-.li a, .dropbtn {
+.li a,
+.dropbtn {
     color: white;
     display: inline-block;
     text-align: center;
@@ -104,8 +109,14 @@ canvas {
     padding-bottom: 10px;
 }
 
-.li a:hover, .dropdown:hover .dropbtn, button:hover {
+.li a:hover,
+.dropdown:hover .dropbtn,
+button:hover {
     background-color: var(--qroui-button-hover-color) !important;
+}
+
+.li a:hover select {
+    background-color: var(--qroui-button-active-color) !important;
 }
 
 .li a i {
@@ -127,7 +138,8 @@ canvas {
     overflow: auto;
 }
 
-.dropdown-content, #results {
+.dropdown-content,
+#results {
     display: none;
     position: absolute;
     background-color: var(--qroui-button-hover-color);
@@ -137,7 +149,8 @@ canvas {
     z-index: 1;
 }
 
-.dropdown-content a, #results a {
+.dropdown-content a,
+#results a {
     padding: 10px;
     text-decoration: none;
     display: block;
@@ -146,7 +159,8 @@ canvas {
     padding-bottom: 8px;
 }
 
-.dropdown-content a:hover, #results a:hover {
+.dropdown-content a:hover,
+#results a:hover {
     background-color: var(--qroui-button-active-color) !important;
 }
 
@@ -254,4 +268,47 @@ input[type=checkbox] {
     margin-top: 3px;
     accent-color: var(--qroui-button-active-color);
     cursor: pointer;
+}
+
+select {
+    color: white;
+    background-color: var(--qroui-button-hover-color);
+    border: none;
+    font-size: 16px;
+    display: inline-block;
+    margin-top: -1px;
+    margin-left: -4px;
+}
+
+#inspector {
+    background: var(--qroui-base-color);
+    border: var(--qroui-button-hover-color) solid;
+    position: absolute;
+    box-sizing: border-box;
+}
+
+#inspectorcontent {
+    padding: 15px;
+}
+
+#inspectorcontent label {
+    display: inline-block;
+    margin: 5px;
+    margin-left: 0;
+}
+
+#inspectorcontent input[type=checkbox] {
+    margin: 7px;
+    position: absolute;
+    margin-left: 0;
+}
+
+#inspectorcontent input[type=number], #inspectorcontent input[type=text], #inspectorcontent input[type=color] {
+    width: 100%;
+    padding: 8px;
+    background-color: #202020;
+    color: white;
+    border: none;
+    
+    border-radius: 5px;
 }

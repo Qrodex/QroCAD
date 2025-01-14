@@ -2,7 +2,8 @@ const { app, BrowserWindow, ipcMain, ipcRenderer, remote, electron } = require("
 const fs = require('fs');
 const path = require('path');
 const { autoUpdater, AppUpdater } = require("electron-updater");
-var win
+var win;
+var openFilePath;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -28,7 +29,17 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  const args = process.argv.slice(1);
+  if (args.length > 0 && fs.existsSync(args[0])) {
+    openFilePath = args[0];
+  }
   createWindow()
+
+  if (openFilePath) {
+    win.webContents.once('did-finish-load', () => {
+      win.webContents.send('open-file', openFilePath);
+    });
+  }
 
   autoUpdater.checkForUpdates();
   console.log(`Checking for updates. Current version ${app.getVersion()}`);
@@ -52,8 +63,19 @@ app.on('window-all-closed', () => {
   }
 })
 
+app.on('open-file', (event, filePath) => {
+  event.preventDefault();
+  openFilePath = filePath;
+  if (win) {
+    win.webContents.send('open-file', openFilePath);
+  }
+});
+
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    createWindow();
   }
-})
+  if (openFilePath && win) {
+    win.webContents.send('open-file', openFilePath);
+  }
+});

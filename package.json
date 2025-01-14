@@ -1,12 +1,13 @@
 {
   "name": "qrocad-desktop",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "The most insane, life-changing computer-aided design application on the web",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "distCI": "electron-builder --win --linux --mac"
+    "distCI": "electron-builder --win --linux --mac",
+    "distdev": "electron-builder --win"
   },
   "repository": "https://github.com/Qrodex/QroCAD",
   "publish": {
@@ -28,6 +29,18 @@
   "build": {
     "appId": "com.qrodex.qrocad",
     "productName": "QroCAD Desktop",
+    "fileAssociations": [
+      {
+        "ext": "qrocad",
+        "name": "QroCAD Project",
+        "icon": "assets/qrocad.png"
+      },
+      {
+        "ext": "qrocad2",
+        "name": "QroCAD 2 Project",
+        "icon": "assets/qrocad2.png"
+      }
+    ],
     "win": {
       "verifyUpdateCodeSignature": false,
       "target": [

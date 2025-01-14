@@ -20,14 +20,15 @@
 
 // Enumerate all available types of component
 var COMPONENT_TYPES = {
-		POINT : 1,
-		LINE : 2,
-		CIRCLE : 3,
-		RECTANGLE : 4,
-		ARC : 5,
-		MEASURE : 6,
-		LABEL : 7,
-		SHAPE : 8 // TODO
+	POINT: 1,
+	LINE: 2,
+	CIRCLE: 3,
+	RECTANGLE: 4,
+	ARC: 5,
+	MEASURE: 6,
+	LABEL: 7,
+	SHAPE: 8, // TODO
+	PICTURE: 9
 };
 
 /**
@@ -36,34 +37,65 @@ var COMPONENT_TYPES = {
  */
 function Component() {
 	this.active = true;
-	this.type = 0; 
-	this.color = "#fff";
+	this.type = 0;
+	this.color = "#ffffff";
 	this.radius = 1;
 }
 
-Component.prototype.setActive = function(active) {
+Component.prototype.setActive = function (active) {
 	this.active = active;
 };
 
-Component.prototype.isActive = function() {
+Component.prototype.isActive = function () {
 	return this.active;
 };
+
+/**
+ * Picture component class
+ * Inherits from Component
+ * @param x
+ * @param y
+ * @param basedURL
+ * @param color
+ * @param radius
+ */
+function Picture(x, y, basedURL, color, radius) {
+	Component.call(this)
+
+	this.color = color || "#ffffff";
+	this.radius = radius || 1;
+	this.type = COMPONENT_TYPES.PICTURE;
+	this.x = 0;
+	this.y = 0;
+	this.pictureSource = ''
+	if (x != undefined && y != undefined && basedURL != undefined) {
+		this.x = x;
+		this.y = y;
+		this.pictureSource = basedURL
+	}
+}
+Picture.prototype = new Component();
+Picture.prototype.constructor = Picture;
 
 /**
  * Point component class
  * Inherits from Component
  * @param x
  * @param y
+ * @param color
+ * @param radius
  */
-function Point(x, y) {
+function Point(x, y, color, radius) {
 	Component.call(this);
-	
+
 	this.radius = 5;
 	this.type = COMPONENT_TYPES.POINT;
 	this.x = 0;
 	this.y = 0;
-	
-	if ( x != undefined && y != undefined) {
+	this.color = color || "#ffffff";
+	this.radius = radius || 1;
+
+	if (x != undefined && y != undefined) {
 		this.x = x;
 		this.y = y;
 	}
@@ -78,21 +110,24 @@ Point.prototype.constructor = Point;
  * @param y1
  * @param x2
  * @param y2
+ * @param color
+ * @param radius
  */
-function Line(x1, y1, x2, y2) {
+function Line(x1, y1, x2, y2, color, radius) {
 	Component.call(this);
-	
+
 	this.type = COMPONENT_TYPES.LINE;
 	this.x1 = 0;
 	this.y1 = 0;
 	this.x2 = 0;
 	this.y2 = 0;
-	
-	if ( x1 != undefined
+	this.color = color || "#ffffff";
+	this.radius = radius || 1;
+
+	if (x1 != undefined
 		&& y1 != undefined
 		&& x2 != undefined
-		&& y2 != undefined)
-	{
+		&& y2 != undefined) {
 		this.x1 = x1;
 		this.y1 = y1;
 		this.x2 = x2;
@@ -109,10 +144,14 @@ Line.prototype.constructor = Line;
  * @param y1
  * @param x2
  * @param y2
+ * @param color
+ * @param radius
  */
-function Circle(x1, y1, x2, y2) {
+function Circle(x1, y1, x2, y2, color, radius) {
 	Line.call(this, x1, y1, x2, y2);
-	
+
+	this.color = color || "#ffffff";
+	this.radius = radius || 1;
 	this.type = COMPONENT_TYPES.CIRCLE;
 }
 Circle.prototype = new Line();
@@ -125,10 +164,14 @@ Circle.prototype.constructor = Circle;
  * @param y1
  * @param x2
  * @param y2
+ * @param color
+ * @param radius
  */
-function Rectangle(x1, y1, x2, y2) {
+function Rectangle(x1, y1, x2, y2, color, radius) {
 	Line.call(this, x1, y1, x2, y2);
-	
+
+	this.color = color || "#ffffff";
+	this.radius = radius || 1;
 	this.type = COMPONENT_TYPES.RECTANGLE;
 }
 Rectangle.prototype = new Line();
@@ -141,12 +184,15 @@ Rectangle.prototype.constructor = Rectangle;
  * @param y1
  * @param x2
  * @param y2
+ * @param color
+ * @param radius
  */
-function Measure(x1, y1, x2, y2) {
+function Measure(x1, y1, x2, y2, color, radius) {
 	Line.call(this, x1, y1, x2, y2);
-	
+
+	this.color = color || "#ffff33";
+	this.radius = radius || 1;
 	this.type = COMPONENT_TYPES.MEASURE;
-	this.color = "#ff3";
 }
 Measure.prototype = new Line();
 Measure.prototype.constructor = Measure;
@@ -157,30 +203,35 @@ Measure.prototype.constructor = Measure;
  * @param x
  * @param y
  * @param text
+ * @param color
+ * @param radius
  */
-function Label(x, y, text) {
+function Label(x, y, text, color, radius) {
 	Point.call(this, x, y);
-	
+
+	this.color = color || "#eeeeee";
+	this.radius = radius || 1;
 	this.type = COMPONENT_TYPES.LABEL;
-	this.color = "#eee";
 	this.text = text;
 }
 Label.prototype = new Point();
 Label.prototype.constructor = Label;
 
 /**
- * Circle component class
- * Inherits from Component
- * @param x1
- * @param y1
- * @param x2
- * @param y2
- * @param x3
- * @param y3
- */
-function Arc(x1, y1, x2, y2, x3, y3) {
+* Circle component class
+* Inherits from Component
+* @param x1
+* @param y1
+* @param x2
+* @param y2
+* @param x3
+* @param y3
+* @param color
+* @param radius
+*/
+function Arc(x1, y1, x2, y2, x3, y3, color, radius) {
 	Component.call(this);
-	
+
 	this.type = COMPONENT_TYPES.ARC;
 	this.x1 = 0;
 	this.y1 = 0;
@@ -188,14 +239,15 @@ function Arc(x1, y1, x2, y2, x3, y3) {
 	this.y2 = 0;
 	this.x3 = 0;
 	this.y3 = 0;
-	
-	if ( x1 != undefined
+	this.color = color || "#eeeeee";
+	this.radius = radius || 2;
+
+	if (x1 != undefined
 		&& y1 != undefined
 		&& x2 != undefined
 		&& y2 != undefined
 		&& x3 != undefined
-		&& y3 != undefined)
-	{
+		&& y3 != undefined) {
 		this.x1 = x1;
 		this.y1 = y1;
 		this.x2 = x2;
@@ -212,17 +264,20 @@ Arc.prototype.constructor = Arc;
  * Inherits from Component
  * @param x
  * @param y
+ * @param color
+ * @param radius
  */
-function Shape(x, y) {
+function Shape(x, y, color, radius) {
 	Component.call(this);
-	
+
 	this.type = COMPONENT_TYPES.SHAPE;
 	this.x = 0;
 	this.y = 0;
-	this.color = "#f0f";
+	this.color = color || "#eeeeee";
+	this.radius = radius || 2;
 	this.components = new Array();
-	
-	if ( x != undefined && y != undefined) {
+
+	if (x != undefined && y != undefined) {
 		this.x = x;
 		this.y = y;
 	}
@@ -234,6 +289,6 @@ Shape.prototype.constructor = Shape;
  * Add a component to a shape
  * @param component
  */
-Shape.prototype.addComponent = function(component) {
+Shape.prototype.addComponent = function (component) {
 	this.components.push(component);
 };

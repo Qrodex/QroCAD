@@ -46,8 +46,25 @@ if (typeof window.showOpenFilePicker !== 'function') {
     window.showOpenFilePicker = showOpenFilePickerPolyfill
 }
 
+function closeInspector() {
+    componentProperties.innerHTML = "";
+
+    inspectorMenu.style.transition = "all 0.1s ease";
+    inspectorMenu.style.width = "0vw"
+    inspectorMenu.style.borderWidth = "0px";
+
+    setTimeout(() => { inspectorMenu.style.transition = "none"; }, 100);
+}
+
+setInterval(function () { })
+
+function capitalizeString(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 //input prompt for QroCAD Desktop
 async function qroprompt(question) {
+    question = await translateOrLoadFromCache(question, prefLang);
     if (isElectron()) {
         const prompt = require('electron-prompt');
         const answer = await prompt({
@@ -77,6 +94,10 @@ function copy(that) {
     inp.remove();
 }
 
+var inspectorMenu = document.getElementById("inspector")
+var componentProperties = document.getElementById("inspectorcontent")
+inspectorMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
+inspectorMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
 
 var versionspan = document.getElementById("spanversion")
 async function setVersionManual() {
@@ -112,6 +133,8 @@ $(document).ready(function () {
 
     setTimeout(() => {
         $("#loader").fadeOut()
+        startAutomaticTranslation()
+        document.getElementById("languages").value = localStorage.getItem("prefLang") || "default";
         var prevWidth = 0
         var prevHeight = 0
         function resizeCanvas() {
@@ -156,12 +179,12 @@ $(document).ready(function () {
         gd.unitConversionFactor = 1 / 100;
         gd.showOrigin = false;
 
-        $("#gd_navigate").click(function () { gd.setMode(gd.MODES.NAVIGATE); });
+        $("#gd_navigate").click(function () { gd.setMode(gd.MODES.NAVIGATE); gd.cvn.css('cursor', 'grab'); });
         $("#gd_move").click(function () { gd.setMode(gd.MODES.MOVE); });
         $("#gd_edit").click(function () { gd.setMode(gd.MODES.EDIT); });
         $("#gd_delete").click(function () { gd.setMode(gd.MODES.DELETE); });
 
-        $("#query_nav").click(function () { gd.setMode(gd.MODES.NAVIGATE); });
+        $("#query_nav").click(function () { gd.setMode(gd.MODES.NAVIGATE); gd.cvn.css('cursor', 'grab'); });
         $("#query_move").click(function () { gd.setMode(gd.MODES.MOVE); });
         $("#query_edit").click(function () { gd.setMode(gd.MODES.EDIT); });
         $("#query_delete").click(function () { gd.setMode(gd.MODES.DELETE); });
@@ -176,6 +199,7 @@ $(document).ready(function () {
         $("#gd_addrectangle").click(function () { gd.setMode(gd.MODES.ADDRECTANGLE); });
         $("#gd_addmeasure").click(function () { gd.setMode(gd.MODES.ADDMEASURE); });
         $("#gd_addlabel").click(function () { gd.setMode(gd.MODES.ADDLABEL); });
+        $("#gd_addimage").click(function () { gd.setMode(gd.MODES.ADDPICTURE); });
 
         $("#query_addpoint").click(function () { gd.setMode(gd.MODES.ADDPOINT); });
         $("#query_addline").click(function () { gd.setMode(gd.MODES.ADDLINE); });
@@ -184,6 +208,7 @@ $(document).ready(function () {
         $("#query_addrect").click(function () { gd.setMode(gd.MODES.ADDRECTANGLE); });
         $("#query_addmeasure").click(function () { gd.setMode(gd.MODES.ADDMEASURE); });
         $("#query_addlabel").click(function () { gd.setMode(gd.MODES.ADDLABEL); });
+        $("#query_addimage").click(function () { gd.setMode(gd.MODES.ADDPICTURE); });
 
         $("#gd_add_serbatoio_verticale").click(function () { gd.setModeShape(getShapeSerbatoioVerticale); });
         $("#gd_add_albero").click(function () { gd.setModeShape(getShapeAlbero); });
@@ -192,6 +217,7 @@ $(document).ready(function () {
         $("#query_addtree").click(function () { gd.setModeShape(getShapeAlbero); });
 
         initCAD(gd);
+        gd.cvn.css('cursor', 'grab');
 
         let undoStack = [];
         let redoStack = [];
@@ -212,9 +238,10 @@ $(document).ready(function () {
                 };
             }
         }
-        setInterval(checkForChanges, 1000);
+        setInterval(checkForChanges, 500);
 
         function newProject() {
+            closeInspector()
             fileHandle = undefined
             gd.logicDisplay.components = []
             if (!isElectron()) document.getElementById("gd_save").style.display = "none";
@@ -256,7 +283,7 @@ $(document).ready(function () {
                     {
                         description: "QroCAD Project File",
                         accept: {
-                            "qrocad/*": [".json", ".qrocad"],
+                            "qrocad/*": [".json", ".qrocad", ".qrocad2"],
                         },
                     },
                     {
@@ -274,6 +301,7 @@ $(document).ready(function () {
             gd.logicDisplay.components = []
             gd.logicDisplay.importJSON(JSON.parse(contents), gd.logicDisplay.components)
             document.getElementById("gd_save").style.display = "block"
+            closeInspector()
         }
         $("#gd_open").click(openFile);
         $("#query_open").click(openFile)
@@ -368,6 +396,8 @@ $(document).ready(function () {
         document.getElementById("gd_download").style.display = "none"
 
         const remote = require('@electron/remote')
+        const { ipcRenderer } = require('electron');
+        const fs = require('fs');
         const app = remote.app
         const getWindow = () => remote.BrowserWindow.getFocusedWindow();
         const window = getWindow();
@@ -387,6 +417,28 @@ $(document).ready(function () {
             const window = getWindow();
             window.isMaximized() ? window.unmaximize() : window.maximize();
         }
+
+        ipcRenderer.on('open-file', (event, filePath) => {
+            var waitForLoad = setInterval(function () {
+                if (gd) {
+                    clearInterval(waitForLoad);
+                    try {
+                        if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
+                            const contents = fs.readFileSync(filePath, 'utf8');
+                            const parsedData = JSON.parse(contents);
+                            gd.logicDisplay.components = [];
+                            gd.logicDisplay.importJSON(parsedData, gd.logicDisplay.components);
+                            document.getElementById("gd_save").style.display = "block";
+                            closeInspector();
+                        } else {
+                            console.log(`Error processing file: ${filePath} (File/Path not found)`);
+                        }
+                    } catch (error) {
+                        console.log(`Error processing file: ${filePath}`, error);
+                    }
+                }
+            })
+        });
 
         setInterval(function () {
             if (window.isMaximized() & lastWindowState == 'win') {

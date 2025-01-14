@@ -56,7 +56,7 @@ function GraphicDisplay(displayName, width, height) {
 
 	this.previousColor = null;
 	this.previousRadius = null;
-	
+
 	this.enableLerping = false
 
 	// The index of temporary selected component
@@ -71,8 +71,8 @@ function GraphicDisplay(displayName, width, height) {
 		null, null);  // x3, y3
 
 	// Temporary or selected color
-	this.selectedColor = "#c0c";
-	this.selectedRadius = "2";
+	this.selectedColor = "#cc00cc";
+	this.selectedRadius = 2;
 
 	this.logicDisplay;
 
@@ -90,7 +90,7 @@ function GraphicDisplay(displayName, width, height) {
 	this.zoomin = 2;
 	this.zoomout = 0.5;
 	this.currentZoom = 1; // Add this to your initialization
-    this.targetZoom = 1;  // Add this to your initialization
+	this.targetZoom = 1;  // Add this to your initialization
 	this.camMoving = false;
 	this.xCNaught = 0;
 	this.yCNaught = 0;
@@ -117,6 +117,7 @@ function GraphicDisplay(displayName, width, height) {
 	// Snapping setting
 	this.snap = true;
 	this.snapTolerance = 10;
+	this.doSnapToGrid = false
 
 	this.fontSize = 24;
 
@@ -129,11 +130,57 @@ function GraphicDisplay(displayName, width, height) {
 
 	this.keyboard = null;
 	this.mouse = null;
+
+	this.imageCache = {};
 }
 
-GraphicDisplay.prototype.lerp = function(a, b, t) {
+GraphicDisplay.prototype.lerp = function (a, b, t) {
 	return a + (b - a) * t
 }
+
+//originally implemented for ccad, go check it out!
+GraphicDisplay.prototype.drawPicture = function (x, y, basedURL) {
+	this.drawPoint(x, y, '#0ff', 2);
+
+	if (!this.imageCache[basedURL]) {
+		const img = new Image();
+		img.crossOrigin = 'anonymous';
+		img.src = basedURL;
+
+		img.onerror = () => {
+			this.imageCache[basedURL] = true;
+		};
+		img.onload = () => {
+			this.imageCache[basedURL] = img;
+			this.renderImage(x, y, img);
+		};
+	} else {
+		this.renderImage(x, y, this.imageCache[basedURL]);
+	}
+};
+
+GraphicDisplay.prototype.renderImage = function (x, y, img) {
+	if (img == true) {
+		this.drawLabel(
+			x,
+			y,
+			"Error loading image!",
+			"#ff0000",
+			5);
+		return
+	}
+
+	const width = img.naturalWidth * this.zoom || 100;
+	const height = img.naturalHeight * this.zoom || 100;
+
+	this.context.drawImage(
+		img,
+		(x + this.cOutX) * this.zoom,
+		(y + this.cOutY) * this.zoom,
+		width,
+		height
+	);
+};
 
 GraphicDisplay.prototype.init = function () {
 	/*
@@ -274,6 +321,13 @@ GraphicDisplay.prototype.drawComponent = function (component, moveByX, moveByY) 
 			break;
 		case COMPONENT_TYPES.SHAPE:
 			this.drawShape(component);
+			break;
+		case COMPONENT_TYPES.PICTURE:
+			this.drawPicture(
+				component.x + moveByX,
+				component.y + moveByY,
+				component.pictureSource
+			);
 			break;
 	}
 };
@@ -536,7 +590,7 @@ GraphicDisplay.prototype.drawToolTip = function () {
 
 GraphicDisplay.prototype.drawOrigin = function (cx, cy) {
 	this.context.lineWidth = 0.5;
-	this.context.strokeStyle = "#fff";
+	this.context.strokeStyle = "#ffffff";
 
 	this.context.beginPath();
 	this.context.moveTo(cx * this.zoom, -this.displayHeight);
@@ -627,7 +681,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					this.temporaryPoints[1]));
 				this.resetMode();
 			}
-			this.tooltip = "Add point";
+			this.setToolTip("Add Point");
 			break;
 		case this.MODES.ADDLINE:
 			if (e.which == 3)
@@ -660,7 +714,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					this.temporaryPoints[1] = this.temporaryPoints[3];
 				}
 			}
-			this.tooltip = "Add line";
+			this.setToolTip("Add Line");
 			break;
 		case this.MODES.ADDCIRCLE:
 			this.cvn.css('cursor', 'default');
@@ -688,7 +742,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					this.resetMode();
 				}
 			}
-			this.tooltip = "Add circle";
+			this.setToolTip("Add Circle");
 			break;
 		case this.MODES.ADDARC:
 			this.cvn.css('cursor', 'default');
@@ -727,7 +781,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					this.resetMode();
 				}
 			}
-			this.tooltip = "Add arc";
+			this.setToolTip("Add Arc");
 			break;
 		case this.MODES.ADDRECTANGLE:
 			this.cvn.css('cursor', 'default');
@@ -755,7 +809,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					this.resetMode();
 				}
 			}
-			this.tooltip = "Add rectangle";
+			this.setToolTip("Add Rectangle");
 			break;
 		case this.MODES.ADDMEASURE:
 			this.cvn.css('cursor', 'default');
@@ -783,7 +837,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					this.resetMode();
 				}
 			}
-			this.tooltip = "Add measure";
+			this.setToolTip("Add Measure");
 			break;
 		case this.MODES.ADDLABEL:
 			this.cvn.css('cursor', 'default');
@@ -804,7 +858,25 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					this.resetMode();
 				}
 			}
-			this.tooltip = "Add label";
+			this.setToolTip("Add Label");
+			break;
+		case this.MODES.ADDPICTURE:
+			this.cvn.css('cursor', 'default');
+			if (action == this.MOUSEACTION.MOVE) {
+				if (this.temporaryComponentType == null) {
+					this.temporaryComponentType = COMPONENT_TYPES.POINT;
+				} else if (this.temporaryComponentType == COMPONENT_TYPES.POINT) {
+					this.temporaryPoints[0] = this.getCursorXLocal();
+					this.temporaryPoints[1] = this.getCursorYLocal();
+				}
+			} else if (action == this.MOUSEACTION.DOWN) {
+				var imageURL = await qroprompt("Image URL:");
+				if (imageURL.length > 0) {
+					this.logicDisplay.addComponent(new Picture(this.temporaryPoints[0], this.temporaryPoints[1], imageURL));
+					this.resetMode();
+				}
+			}
+			this.setToolTip("Add Image");
 			break;
 		case this.MODES.ADDSHAPE:
 			this.cvn.css('cursor', 'default');
@@ -821,17 +893,19 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 			}
 			break;
 		case this.MODES.NAVIGATE:
-			this.cvn.css('cursor', 'move');
 			if (action == this.MOUSEACTION.DOWN) {
+				this.cvn.css('cursor', 'grabbing');
 				this.camMoving = true;
 				this.xCNaught = this.getCursorXLocal();
 				this.yCNaught = this.getCursorYLocal();
 			} else if (action == this.MOUSEACTION.UP) {
+				this.cvn.css('cursor', 'grab');
 				this.camMoving = false;
 				this.camX += this.getCursorXLocal() - this.xCNaught;
 				this.camY += this.getCursorYLocal() - this.yCNaught;
 			}
-			this.tooltip = "Navigate";
+
+			this.setToolTip("Navigate");
 			break;
 		case this.MODES.MOVE:
 			this.cvn.css('cursor', 'default');
@@ -854,11 +928,112 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					this.unselectComponent();
 				}
 			}
-			this.tooltip = "Move";
+			this.setToolTip("Move");
 			break;
 		case this.MODES.EDIT:
-			// TODO: In the next release 
-			this.tooltip = "Edit";
+			this.cvn.css('cursor', 'default');
+			if (action == this.MOUSEACTION.MOVE) {
+				if (this.selectedComponent == null) {
+					this.temporarySelectedComponent = this.findIntersectionWith(
+						this.getCursorXLocal(),
+						this.getCursorYLocal());
+				}
+			} else if (action == this.MOUSEACTION.DOWN) {
+				if (this.selectedComponent == null) {
+					this.selectComponent(this.temporarySelectedComponent);
+
+					if (this.temporarySelectedComponent != null) {
+						inspectorMenu.style.transition = "all 0.1s ease";
+						inspectorMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
+						inspectorMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
+						inspectorMenu.style.width = "25vw";
+						inspectorMenu.style.borderWidth = "1px";
+						componentProperties.innerHTML = "";
+
+						var elemType = Object.keys(COMPONENT_TYPES).find(key => COMPONENT_TYPES[key] === gd.logicDisplay.components[this.selectedComponent]["type"]);
+						let title = document.createElement('h3');
+
+						title.innerText = await translateOrLoadFromCache(`Editing: ${capitalizeString(elemType)}`, prefLang);
+						componentProperties.appendChild(title);
+
+						setTimeout(async () => {
+							inspectorMenu.style.transition = "none";
+
+							Object.entries(gd.logicDisplay.components[this.selectedComponent]).forEach(async ([key, value]) => {
+								if (key == "type") return;
+
+								let input = document.createElement('input');
+								let label = document.createElement('label');
+
+								if (typeof value == 'number') {
+									input.type = "number"
+
+									input.oninput = async function (event) {
+										gd.logicDisplay.components[gd.selectedComponent][key] = parseFloat(event.target.value);
+
+										if (key == "radius") {
+											gd.previousRadius = parseFloat(event.target.value);
+										}
+
+										sendCurrEditor()
+									};
+								} else if (typeof value == 'string') {
+									input.type = "text"
+
+									input.oninput = async function (event) {
+										gd.logicDisplay.components[gd.selectedComponent][key] = event.target.value;
+
+										if (key == "color") {
+											gd.previousColor = event.target.value
+										}
+
+										sendCurrEditor()
+									};
+								} else if (typeof value == 'boolean') {
+									input.type = "checkbox"
+									input.checked = input.value
+
+									input.oninput = async function (event) {
+										gd.logicDisplay.components[gd.selectedComponent][key] = input.checked;
+										sendCurrEditor()
+									};
+								}
+
+								if (key == "color") {
+									input.type = "color"
+									input.value = gd.previousColor
+								} else if (key == "radius") {
+									input.type = "number"
+									input.value = gd.previousRadius
+								} else {
+									input.value = value;
+								}
+
+								componentProperties.appendChild(label);
+								if (typeof value != 'boolean') {
+									componentProperties.appendChild(document.createElement('br'));
+								}
+
+								componentProperties.appendChild(input);
+								componentProperties.appendChild(document.createElement('br'));
+								label.innerText = await translateOrLoadFromCache(capitalizeString(key), prefLang) + ":";
+							});
+						}, 100);
+					}
+				} else {
+					componentProperties.innerHTML = "";
+
+					inspectorMenu.style.transition = "all 0.1s ease";
+					inspectorMenu.style.width = "0vw"
+					inspectorMenu.style.borderWidth = "0px";
+
+					setTimeout(() => { inspectorMenu.style.transition = "none"; }, 100);
+
+					sendCurrEditor()
+					this.unselectComponent();
+				}
+			}
+			this.setToolTip("Edit");
 			break;
 		case this.MODES.DELETE:
 			this.cvn.css('cursor', 'default');
@@ -874,7 +1049,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					sendCurrEditor()
 				}
 			}
-			this.tooltip = "Delete";
+			this.setToolTip("Delete");
 			break;
 		default:
 			this.tooltip = this.tooltipDefault;
@@ -886,6 +1061,7 @@ GraphicDisplay.prototype.moveComponent = function (index, x, y) {
 		switch (this.logicDisplay.components[index].type) {
 			case COMPONENT_TYPES.POINT:
 			case COMPONENT_TYPES.LABEL:
+			case COMPONENT_TYPES.PICTURE:
 			case COMPONENT_TYPES.SHAPE:
 				var dx = x - this.logicDisplay.components[index].x;
 				var dy = y - this.logicDisplay.components[index].y;
@@ -925,15 +1101,19 @@ GraphicDisplay.prototype.selectComponent = function (index) {
 		this.selectedComponent = index;
 		this.previousColor = this.logicDisplay.components[index].color;
 		this.previousRadius = this.logicDisplay.components[index].radius;
-		this.logicDisplay.components[index].color = this.selectedColor;
-		this.logicDisplay.components[index].radius = this.selectedRadius;
+		//this.logicDisplay.components[index].color = this.selectedColor;
+		this.logicDisplay.components[index].radius = this.logicDisplay.components[index].radius + this.selectedRadius;
 	}
 };
 
 GraphicDisplay.prototype.unselectComponent = function () {
 	if (this.selectedComponent != null) {
-		this.logicDisplay.components[this.selectedComponent].color = this.previousColor;
-		this.logicDisplay.components[this.selectedComponent].radius = this.previousRadius;
+		try {
+			this.logicDisplay.components[this.selectedComponent].color = this.previousColor;
+			this.logicDisplay.components[this.selectedComponent].radius = this.previousRadius;
+		} catch (error) {
+			console.error(error)
+		}
 		this.selectedComponent = null;
 	}
 };
@@ -958,12 +1138,16 @@ GraphicDisplay.prototype.setModeShape = function (getShape) {
 };
 
 GraphicDisplay.prototype.setMode = function (mode) {
+	this.unselectComponent();
 	this.resetMode();
 
 	if (this.readonly)
 		this.mode = this.MODES.NAVIGATE;
 	else
 		this.mode = mode;
+
+	if (mode != gd.MODES.EDIT)
+		closeInspector()
 };
 
 GraphicDisplay.prototype.resetMode = function () {
@@ -981,7 +1165,7 @@ GraphicDisplay.prototype.setZoom = function (zoomFactor) {
 	var newZoom = this.currentZoom * zoomFactor;
 
 	// Zoom interval control
-	if ( newZoom <= 0.4 || newZoom >= 4 )
+	if (newZoom <= 0.4 || newZoom >= 4)
 		return;
 
 	this.targetZoom = newZoom;
@@ -995,24 +1179,49 @@ GraphicDisplay.prototype.zoomOut = function () {
 	this.setZoom(this.zoomout);
 };
 
-GraphicDisplay.prototype.getCursorXLocal = function () {
-	return (this.mouse.cursorXGlobal - this.offsetX - this.displayWidth / 2) / this.zoom - this.camX;
+GraphicDisplay.prototype.getCursorXLocal = function (e) {
+	if (this.doSnapToGrid) {
+		const adjustedGridSpacing = Math.max(this.gridSpacing / 2, this.gridSpacing / 2 * this.zoom / 6);
+		const rawXLocal = (this.mouse.cursorXGlobal - this.offsetX - this.displayWidth / 2) / this.zoom - this.camX;
+		return Math.round(rawXLocal / adjustedGridSpacing) * adjustedGridSpacing;
+	} else {
+		return (this.mouse.cursorXGlobal - this.offsetX - this.displayWidth / 2) / this.zoom - this.camX;
+	}
 };
 
-GraphicDisplay.prototype.getCursorYLocal = function () {
-	return (this.mouse.cursorYGlobal - this.offsetY - this.displayHeight / 2) / this.zoom - this.camY;
+GraphicDisplay.prototype.getCursorYLocal = function (e) {
+	if (this.doSnapToGrid) {
+		const adjustedGridSpacing = Math.max(this.gridSpacing / 2, this.gridSpacing / 2 * this.zoom / 6);
+		const rawYLocal = (this.mouse.cursorYGlobal - this.offsetY - this.displayHeight / 2) / this.zoom - this.camY;
+		return Math.round(rawYLocal / adjustedGridSpacing) * adjustedGridSpacing;
+	} else {
+		return (this.mouse.cursorYGlobal - this.offsetY - this.displayHeight / 2) / this.zoom - this.camY;
+	}
 };
 
-GraphicDisplay.prototype.getCursorXInFrame = function () {
-	return this.mouse.cursorXGlobal - this.offsetX - this.displayWidth / 2;
+
+GraphicDisplay.prototype.getCursorXInFrame = function (e) {
+	if (this.doSnapToGrid) {
+		const adjustedGridSpacing = (this.gridSpacing / 2) * this.zoom;
+		const rawXInFrame = this.mouse.cursorXGlobal - this.offsetX - this.displayWidth / 2;
+		return Math.round(rawXInFrame / adjustedGridSpacing) * adjustedGridSpacing;
+	} else {
+		return this.mouse.cursorXGlobal - this.offsetX - this.displayWidth / 2;
+	}
 };
 
-GraphicDisplay.prototype.getCursorYInFrame = function () {
-	return this.mouse.cursorYGlobal - this.offsetY - this.displayHeight / 2;
+GraphicDisplay.prototype.getCursorYInFrame = function (e) {
+	if (this.doSnapToGrid) {
+		const adjustedGridSpacing = (this.gridSpacing / 2) * this.zoom;
+		const rawYInFrame = this.mouse.cursorYGlobal - this.offsetY - this.displayHeight / 2;
+		return Math.round(rawYInFrame / adjustedGridSpacing) * adjustedGridSpacing;
+	} else {
+		return this.mouse.cursorYGlobal - this.offsetY - this.displayHeight / 2;
+	}
 };
 
-GraphicDisplay.prototype.setToolTip = function (text) {
-	this.tooltip = text;
+GraphicDisplay.prototype.setToolTip = async function (text) {
+	this.tooltip = await translateOrLoadFromCache(text, prefLang);
 };
 
 GraphicDisplay.prototype.getToolTip = function () {
@@ -1043,6 +1252,8 @@ GraphicDisplay.prototype.findIntersectionWith = function (x, y) {
 		switch (this.logicDisplay.components[i].type) {
 			case COMPONENT_TYPES.POINT:
 			case COMPONENT_TYPES.LABEL:
+			case COMPONENT_TYPES.PICTURE:
+			case COMPONENT_TYPES.ARC:
 			case COMPONENT_TYPES.SHAPE:
 				var delta = this.getDistance(x, y, this.logicDisplay.components[i].x, this.logicDisplay.components[i].y);
 				if (delta >= 0 && delta <= this.snapTolerance / this.zoom)
@@ -1067,22 +1278,11 @@ GraphicDisplay.prototype.findIntersectionWith = function (x, y) {
  * Return the angle in radiants
  */
 GraphicDisplay.prototype.getAngle = function (x1, y1, x2, y2) {
-	var PI = 3.14159265359;
-	var theta = Math.atan((y2 - y1) / (x2 - y2)) * (PI / 180);
+	// thank you ccad: https://github.com/zeankundev/CompassCAD/commit/51fbd111e39f5e4dac064f276eff10bdd7a69c63
+	var theta = Math.atan2((y2 - y1), (x2 - x1));
+	var angle = theta * (Math.PI / Math.PI);
 
-	if (x2 < x1)
-		theta -= PI;
-	else if (y2 > y1)
-		theta -= PI * 2;
-
-	if (x2 == x1) {
-		theta = PI / 2;
-
-		if (y2 < y1)
-			theta = (PI / 2) * 3;
-	}
-
-	return theta;
+	return angle;
 };
 
 /*
@@ -1129,16 +1329,16 @@ var initCAD = function (gd) {
 		gd.mouse.onMouseUp(e);
 		gd.performAction(e, gd.MOUSEACTION.UP);
 	});
+
 	gd.cvn.on('wheel', (event) => {
 		let zoomFactor = 1
-        if (event.originalEvent.deltaY < 0) {
-            gd.zoomIn()
-        } else {
-            gd.zoomOut()
-        }
-        console.log(`Zoom factor: ${zoomFactor}`);
-        event.preventDefault();
-    });
+		if (event.originalEvent.deltaY < 0) {
+			gd.zoomIn()
+		} else {
+			gd.zoomOut()
+		}
+		event.preventDefault();
+	});
 
 	//handle mouse zooming
 	function zoomCanvas(e) {
