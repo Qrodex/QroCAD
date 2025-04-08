@@ -131,6 +131,8 @@ function GraphicDisplay(displayName, width, height) {
 	this.keyboard = null;
 	this.mouse = null;
 
+	this.clickOut = false
+
 	this.imageCache = {};
 }
 
@@ -939,10 +941,11 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 						this.getCursorYLocal());
 				}
 			} else if (action == this.MOUSEACTION.DOWN) {
-				if (this.selectedComponent == null) {
+				if (this.selectedComponent == null && this.clickOut == false) {
 					this.selectComponent(this.temporarySelectedComponent);
 
 					if (this.temporarySelectedComponent != null) {
+						closeExplorer()
 						inspectorMenu.style.transition = "all 0.1s ease";
 						inspectorMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
 						inspectorMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
@@ -958,66 +961,7 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 
 						setTimeout(async () => {
 							inspectorMenu.style.transition = "none";
-
-							Object.entries(gd.logicDisplay.components[this.selectedComponent]).forEach(async ([key, value]) => {
-								if (key == "type") return;
-
-								let input = document.createElement('input');
-								let label = document.createElement('label');
-
-								if (typeof value == 'number') {
-									input.type = "number"
-
-									input.oninput = async function (event) {
-										gd.logicDisplay.components[gd.selectedComponent][key] = parseFloat(event.target.value);
-
-										if (key == "radius") {
-											gd.previousRadius = parseFloat(event.target.value);
-										}
-
-										sendCurrEditor()
-									};
-								} else if (typeof value == 'string') {
-									input.type = "text"
-
-									input.oninput = async function (event) {
-										gd.logicDisplay.components[gd.selectedComponent][key] = event.target.value;
-
-										if (key == "color") {
-											gd.previousColor = event.target.value
-										}
-
-										sendCurrEditor()
-									};
-								} else if (typeof value == 'boolean') {
-									input.type = "checkbox"
-									input.checked = input.value
-
-									input.oninput = async function (event) {
-										gd.logicDisplay.components[gd.selectedComponent][key] = input.checked;
-										sendCurrEditor()
-									};
-								}
-
-								if (key == "color") {
-									input.type = "color"
-									input.value = gd.previousColor
-								} else if (key == "radius") {
-									input.type = "number"
-									input.value = gd.previousRadius
-								} else {
-									input.value = value;
-								}
-
-								componentProperties.appendChild(label);
-								if (typeof value != 'boolean') {
-									componentProperties.appendChild(document.createElement('br'));
-								}
-
-								componentProperties.appendChild(input);
-								componentProperties.appendChild(document.createElement('br'));
-								label.innerText = await translateOrLoadFromCache(capitalizeString(key), prefLang) + ":";
-							});
+							doInspectObject()
 						}, 100);
 					}
 				} else {
@@ -1028,6 +972,8 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					inspectorMenu.style.borderWidth = "0px";
 
 					setTimeout(() => { inspectorMenu.style.transition = "none"; }, 100);
+
+					this.clickOut = false
 
 					sendCurrEditor()
 					this.unselectComponent();
@@ -1316,6 +1262,11 @@ var initCAD = function (gd) {
 	});
 
 	gd.cvn.mousedown(function (e) {
+		closeExplorer()
+		if (gd.mode != gd.MODES.MOVE) {
+			if (inspectorMenu.style.width != "0vw") gd.clickOut = true;
+			gd.unselectComponent();
+		}
 		gd.mouse.onMouseDown(e);
 		gd.performAction(e, gd.MOUSEACTION.DOWN);
 	});

@@ -46,6 +46,27 @@ if (typeof window.showOpenFilePicker !== 'function') {
     window.showOpenFilePicker = showOpenFilePickerPolyfill
 }
 
+async function openInspector() {
+    closeExplorer()
+
+    inspectorMenu.style.transition = "all 0.1s ease";
+    inspectorMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
+    inspectorMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
+    inspectorMenu.style.width = "25vw";
+    inspectorMenu.style.borderWidth = "1px";
+    componentProperties.innerHTML = "";
+
+    var elemType = Object.keys(COMPONENT_TYPES).find(key => COMPONENT_TYPES[key] === gd.logicDisplay.components[gd.selectedComponent]["type"]);
+    let title = document.createElement('h3');
+
+    title.innerText = await translateOrLoadFromCache(`Editing: ${capitalizeString(elemType)}`, prefLang);
+    componentProperties.prepend(title);
+
+    setTimeout(async () => {
+        inspectorMenu.style.transition = "none";
+    }, 100);
+}
+
 function closeInspector() {
     componentProperties.innerHTML = "";
 
@@ -54,6 +75,18 @@ function closeInspector() {
     inspectorMenu.style.borderWidth = "0px";
 
     setTimeout(() => { inspectorMenu.style.transition = "none"; }, 100);
+
+    gd.unselectComponent();
+}
+
+function closeExplorer() {
+    componentProperties.innerHTML = "";
+
+    explorerMenu.style.transition = "all 0.1s ease";
+    explorerMenu.style.width = "0vw"
+    explorerMenu.style.borderWidth = "0px";
+
+    setTimeout(() => { explorerMenu.style.transition = "none"; }, 100);
 }
 
 setInterval(function () { })
@@ -94,16 +127,83 @@ function copy(that) {
     inp.remove();
 }
 
+var explorerMenu = document.getElementById("explorer")
+var explorerList = document.getElementById("explorercontent")
 var inspectorMenu = document.getElementById("inspector")
 var componentProperties = document.getElementById("inspectorcontent")
+
 inspectorMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
 inspectorMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
+explorerMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
+explorerMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
 
 var versionspan = document.getElementById("spanversion")
 async function setVersionManual() {
     const fetchpackage = await fetch("package.json")
     const packagejson = await fetchpackage.json()
     versionspan.innerText = (packagejson.version)
+}
+
+function doInspectObject() {
+    Object.entries(gd.logicDisplay.components[gd.selectedComponent]).forEach(async ([key, value]) => {
+        if (key == "type") return;
+
+        let input = document.createElement('input');
+        let label = document.createElement('label');
+
+        if (typeof value == 'number') {
+            input.type = "number"
+
+            input.oninput = async function (event) {
+                gd.logicDisplay.components[gd.selectedComponent][key] = parseFloat(event.target.value);
+
+                if (key == "radius") {
+                    gd.previousRadius = parseFloat(event.target.value);
+                }
+
+                sendCurrEditor()
+            };
+        } else if (typeof value == 'string') {
+            input.type = "text"
+
+            input.oninput = async function (event) {
+                gd.logicDisplay.components[gd.selectedComponent][key] = event.target.value;
+
+                if (key == "color") {
+                    gd.previousColor = event.target.value
+                }
+
+                sendCurrEditor()
+            };
+        } else if (typeof value == 'boolean') {
+            input.type = "checkbox"
+            input.checked = value
+
+            input.oninput = async function (event) {
+                gd.logicDisplay.components[gd.selectedComponent][key] = input.checked;
+                sendCurrEditor()
+            };
+        }
+
+        if (key == "color") {
+            input.type = "color"
+            input.value = gd.previousColor
+        } else if (key == "radius") {
+            input.type = "number"
+            input.value = gd.previousRadius
+        } else {
+            input.value = value;
+        }
+
+        componentProperties.appendChild(label);
+        if (typeof value != 'boolean') {
+            componentProperties.appendChild(document.createElement('br'));
+        }
+
+        componentProperties.appendChild(input);
+        componentProperties.appendChild(document.createElement('br'));
+        label.innerText = await translateOrLoadFromCache(capitalizeString(key), prefLang) + ":";
+    });
 }
 
 //main app
@@ -138,7 +238,7 @@ $(document).ready(function () {
         var prevWidth = 0
         var prevHeight = 0
         function resizeCanvas() {
-            let currWidth = (window.innerWidth - document.getElementById('sideButtons').getBoundingClientRect().width) - 1
+            let currWidth = (window.innerWidth - document.getElementById('sideButtons').getBoundingClientRect().width) - 2
             let currHeight = (window.innerHeight - document.getElementById('controls').getBoundingClientRect().height) - 1
 
             if ((currHeight != prevHeight) || (currWidth != prevWidth)) {
@@ -242,12 +342,58 @@ $(document).ready(function () {
 
         function newProject() {
             closeInspector()
+            closeExplorer()
             fileHandle = undefined
             gd.logicDisplay.components = []
             if (!isElectron()) document.getElementById("gd_save").style.display = "none";
         }
         $("#gd_blank").click(newProject)
         $("#query_new").click(newProject)
+
+        function openExplorer() {
+            if (explorerMenu.style.width == "0vw") {
+                closeInspector()
+                explorerMenu.style.transition = "all 0.1s ease";
+                explorerMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
+                explorerMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
+                explorerMenu.style.width = "25vw";
+                explorerMenu.style.borderWidth = "1px";
+                explorerList.innerHTML = "<h3>Explorer</h3>";
+
+                const explorercontent = document.getElementById("explorercontent")
+
+                if (gd.logicDisplay.components.length == 0) {
+                    explorercontent.innerHTML = "<h3>Explorer</h3>Add a component to the project to see it here!"
+                }
+
+                Object.keys(gd.logicDisplay.components).forEach(function (key, index) {
+                    var component = gd.logicDisplay.components[key];
+                    var button = document.createElement("input");
+                    var elemType = Object.keys(COMPONENT_TYPES).find(key => COMPONENT_TYPES[key] === component.type);
+
+                    button.className = "item-search";
+                    button.type = "button";
+                    button.value = `${capitalizeString(elemType)}`;
+                    button.onclick = function () {
+                        gd.selectComponent(key);
+                        openInspector()
+                        doInspectObject()
+                    }
+
+                    if (index > 0) {
+                        explorercontent.appendChild(document.createElement("br"));
+                        explorercontent.appendChild(document.createElement("br"));
+                        explorercontent.appendChild(button);
+                    } else {
+                        explorercontent.appendChild(document.createElement("br"));
+                        explorercontent.appendChild(button);
+                    }
+                })
+            } else {
+                closeExplorer()
+            }
+        }
+        $("#gd_explorer").click(openExplorer)
 
         function undo() {
             if (undoStack.length > 0) {
@@ -302,6 +448,7 @@ $(document).ready(function () {
             gd.logicDisplay.importJSON(JSON.parse(contents), gd.logicDisplay.components)
             document.getElementById("gd_save").style.display = "block"
             closeInspector()
+            closeExplorer()
         }
         $("#gd_open").click(openFile);
         $("#query_open").click(openFile)
@@ -430,6 +577,7 @@ $(document).ready(function () {
                             gd.logicDisplay.importJSON(parsedData, gd.logicDisplay.components);
                             document.getElementById("gd_save").style.display = "block";
                             closeInspector();
+                            closeExplorer();
                         } else {
                             console.log(`Error processing file: ${filePath} (File/Path not found)`);
                         }

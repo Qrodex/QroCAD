@@ -2,8 +2,9 @@
 
 <head>
 	<link rel="stylesheet" href="css/index.css">
-	<link rel="stylesheet" href="woff2/fonts.css">
-	<link rel="stylesheet" href="woff2/din-next-lt/din-next.css">
+	<link rel="stylesheet" href="css/scroll.css">
+	<link rel="stylesheet" href="assets/woff2/fonts.css">
+	<link rel="stylesheet" href="assets/woff2/din-next-lt/din-next.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@devyr/mdl2-ui-icons@1.0.2/css/mdl2-ui-icons.min.css">
 	<title>QroCAD</title>
 
@@ -24,8 +25,8 @@
 
 <body>
 	<ul class="ul" id="controls">
-		<li class="dropdown li">
-			<a class="dropbtn" style="width: 45.25px; display: flex; justify-content: center; place-items: center;">
+		<li id="logobutton" class="dropdown li" onclick="gd.logicDisplay.importJSON(preset, gd.logicDisplay.components); localStorage.setItem('clicked84', true); this.classList.remove('tada');">
+			<a class="dropbtn cornerlogo">
 				<img src="assets/Qr.svg" style="width: 18px;">
 			</a>
 		</li>
@@ -193,64 +194,78 @@
 		<a class="item-search" id="query_addvtank"><span>Add Vertical Tank</span></a>
 		<a class="item-search" id="query_addtree"><span>Add Tree</span></a>
 	</div>
-	<div id="sideButtons">
-		<button id="gd_navigate" title="Navigate">
-			<i class="fa-solid fa-hand"></i>
-		</button>
-		<button id="gd_move" title="Move">
-			<i class="fa-solid fa-up-down-left-right"></i>
-		</button>
-		<button id="gd_edit" title="Edit">
-			<i class="fa-solid fa-pen"></i>
-		</button>
-		<button id="gd_delete" title="Delete">
-			<i class="fa-solid fa-trash"></i>
-		</button>
+	<div id="sidecontainer">
+		<div id="sideButtons">
+			<button id="gd_explorer" title="Explorer">
+				<i class="fa-solid fa-list"></i>
+			</button>
 
-		<button>
-			<hr>
-		</button>
+			<button>
+				<hr>
+			</button>
 
-		<button id="gd_addpoint" title="Add Point">
-			<i class="fa-solid fa-pen-nib"></i>
-		</button>
-		<button id="gd_addline" title="Add Line">
-			<i class="fa-solid fa-minus" style="transform: rotate(-45deg);"></i>
-		</button>
-		<button id="gd_addcircle" title="Add Circle">
-			<i class="fa-regular fa-circle"></i>
-		</button>
-		<button id="gd_addarc" title="Add Arc">
-			<i class="fa-solid fa-bezier-curve"></i>
-		</button>
-		<button id="gd_addrectangle" title="Add Rectangle">
-			<i class="fa-solid fa-vector-square"></i>
-		</button>
+			<button id="gd_navigate" title="Navigate">
+				<i class="fa-solid fa-hand"></i>
+			</button>
+			<button id="gd_move" title="Move">
+				<i class="fa-solid fa-up-down-left-right"></i>
+			</button>
+			<button id="gd_edit" title="Edit">
+				<i class="fa-solid fa-pen"></i>
+			</button>
+			<button id="gd_delete" title="Delete">
+				<i class="fa-solid fa-trash"></i>
+			</button>
 
-		<button>
-			<hr>
-		</button>
+			<button>
+				<hr>
+			</button>
 
-		<button id="gd_addmeasure" title="Add Measure">
-			<i class="fa-solid fa-ruler-combined"></i>
-		</button>
-		<button id="gd_addlabel" title="Add Label">
-			<i class="fa-solid fa-tag"></i>
-		</button>
-		<button id="gd_addimage" title="Add Image">
-			<i class="fa-regular fa-image"></i>
-		</button>
+			<button id="gd_addpoint" title="Add Point">
+				<i class="fa-solid fa-pen-nib"></i>
+			</button>
+			<button id="gd_addline" title="Add Line">
+				<i class="fa-solid fa-minus" style="transform: rotate(-45deg);"></i>
+			</button>
+			<button id="gd_addcircle" title="Add Circle">
+				<i class="fa-regular fa-circle"></i>
+			</button>
+			<button id="gd_addarc" title="Add Arc">
+				<i class="fa-solid fa-bezier-curve"></i>
+			</button>
+			<button id="gd_addrectangle" title="Add Rectangle">
+				<i class="fa-solid fa-vector-square"></i>
+			</button>
 
-		<button id="extra-separator">
-			<hr>
-		</button>
+			<button>
+				<hr>
+			</button>
 
-		<button id="extra-desktop" title="Get QroCAD Desktop!">
-			<i class="fa-solid fa-download"></i>
-		</button>
+			<button id="gd_addmeasure" title="Add Measure">
+				<i class="fa-solid fa-ruler-combined"></i>
+			</button>
+			<button id="gd_addlabel" title="Add Label">
+				<i class="fa-solid fa-tag"></i>
+			</button>
+			<button id="gd_addimage" title="Add Image">
+				<i class="fa-regular fa-image"></i>
+			</button>
+
+			<button id="extra-separator">
+				<hr>
+			</button>
+
+			<button id="extra-desktop" title="Get QroCAD Desktop!">
+				<i class="fa-solid fa-download"></i>
+			</button>
+		</div>
 	</div>
 	<div id="inspector" style="width: 0vw; border-width: 0px;">
 		<div id="inspectorcontent">
+		</div>
+	</div>
+	<div id="explorer" style="width: 0vw; border-width: 0px;">
+		<div id="explorercontent">
 		</div>
 	</div>
 	<canvas id="CADCanvas" width="1024" height="600" onContextMenu="javascript: return false;" tabindex="1"></canvas>

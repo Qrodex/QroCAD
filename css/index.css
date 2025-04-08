@@ -49,6 +49,7 @@ header {
     align-items: center;
     overflow: hidden;
     app-region: drag;
+    height: 44px;
 }
 
 .rightwing {
@@ -103,9 +104,8 @@ canvas {
     color: white;
     display: inline-block;
     text-align: center;
-    padding: 12px;
+    padding: 13px;
     text-decoration: none;
-    padding-top: 14px;
     padding-bottom: 10px;
 }
 
@@ -280,35 +280,94 @@ select {
     margin-left: -4px;
 }
 
-#inspector {
+#inspector,
+#explorer {
     background: var(--qroui-base-color);
     border: var(--qroui-button-hover-color) solid;
     position: absolute;
     box-sizing: border-box;
 }
 
-#inspectorcontent {
+#inspectorcontent,
+#explorercontent {
     padding: 15px;
 }
 
-#inspectorcontent label {
+#inspectorcontent label,
+#explorercontent label {
     display: inline-block;
     margin: 5px;
     margin-left: 0;
 }
 
-#inspectorcontent input[type=checkbox] {
+#inspectorcontent input[type=checkbox],
+#explorercontent input[type=checkbox] {
     margin: 7px;
     position: absolute;
     margin-left: 0;
 }
 
-#inspectorcontent input[type=number], #inspectorcontent input[type=text], #inspectorcontent input[type=color] {
+#inspectorcontent input[type=number],
+#inspectorcontent input[type=text],
+#inspectorcontent input[type=color],
+#inspectorcontent input[type=button],
+#explorercontent input[type=number],
+#explorercontent input[type=text],
+#explorercontent input[type=color],
+#explorercontent input[type=button] {
     width: 100%;
     padding: 8px;
     background-color: #202020;
     color: white;
     border: none;
-    
     border-radius: 5px;
+    text-align: left;
+}
+
+#sidecontainer {
+    height: calc(100vh - 44px);
+    overflow: auto;
+    position: absolute;
+}
+
+.cornerlogo {
+    width: 45.25px;
+    display: flex !important;
+    justify-content: center;
+    place-items: center;
+    padding-top: 10px !important;
+}
+
+.tada {
+    animation-name: tada;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    animation-iteration-count: infinite;
+}
+
+@keyframes tada {
+    0% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+
+    10%, 20% {
+        -webkit-transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+        transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+    }
+
+    30%, 50%, 70%, 90% {
+        -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+        transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+    }
+
+    40%, 60%, 80% {
+        -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+        transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+    }
+
+    100% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
 }
