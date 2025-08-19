@@ -6,7 +6,9 @@
 	<link rel="stylesheet" href="assets/woff2/fonts.css">
 	<link rel="stylesheet" href="assets/woff2/din-next-lt/din-next.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@devyr/mdl2-ui-icons@1.0.2/css/mdl2-ui-icons.min.css">
+
 	<title>QroCAD</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
@@ -25,7 +27,8 @@
 
 <body>
 	<ul class="ul" id="controls">
-		<li id="logobutton" class="dropdown li" onclick="gd.logicDisplay.importJSON(preset, gd.logicDisplay.components); localStorage.setItem('clicked84', true); this.classList.remove('tada');">
+		<li id="logobutton" class="dropdown li"
+			onclick="gd.logicDisplay.importJSON(preset, gd.logicDisplay.components); localStorage.setItem('clicked84', true); this.classList.remove('tada');">
 			<a class="dropbtn cornerlogo">
 				<img src="assets/Qr.svg" style="width: 18px;">
 			</a>
@@ -200,7 +203,7 @@
 				<i class="fa-solid fa-list"></i>
 			</button>
 
-			<button>
+			<button class="separator">
 				<hr>
 			</button>
 
@@ -217,7 +220,7 @@
 				<i class="fa-solid fa-trash"></i>
 			</button>
 
-			<button>
+			<button class="separator">
 				<hr>
 			</button>
 
@@ -237,7 +240,7 @@
 				<i class="fa-solid fa-vector-square"></i>
 			</button>
 
-			<button>
+			<button class="separator">
 				<hr>
 			</button>
 
@@ -251,7 +254,7 @@
 				<i class="fa-regular fa-image"></i>
 			</button>
 
-			<button id="extra-separator">
+			<button id="extra-separator" class="separator">
 				<hr>
 			</button>
 

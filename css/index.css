@@ -6,6 +6,8 @@
     outline: none;
     box-sizing: border-box;
     user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
 }
 
 @keyframes fadedown {
@@ -29,9 +31,11 @@
     --qroui-base-text-color: #fff;
 }
 
-body {
+body,
+html {
     background-color: var(--qroui-base-color);
     color: var(--qroui-base-text-color);
+    overflow: hidden
 }
 
 header {
@@ -134,7 +138,7 @@ button:hover {
     margin-right: calc(135px);
     width: 20vw;
     margin-top: -7px;
-    max-height: 75vh;
+    max-height: 75dvh;
     overflow: auto;
 }
 
@@ -146,7 +150,7 @@ button:hover {
     min-width: 160px;
     animation: fadedown 0.1s ease;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 16px 0px;
-    z-index: 1;
+    z-index: 46;
 }
 
 .dropdown-content a,
@@ -183,7 +187,7 @@ ul input {
 
 #loader {
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     position: absolute;
     background: rgba(29, 29, 29, 0.67);
     top: 0px;
@@ -214,26 +218,6 @@ ul input {
     display: block;
     margin-bottom: 30px;
     width: 5vw;
-}
-
-#activationProgress {
-    font-family: boot;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    margin: 30px;
-}
-
-#introver {
-    right: 0px;
-    top: 0px;
-    margin: 30px;
-    position: absolute;
-}
-
-@font-face {
-    font-family: boot;
-    src: url("../assets/boot.ttf");
 }
 
 .system {
@@ -291,6 +275,8 @@ select {
 #inspectorcontent,
 #explorercontent {
     padding: 15px;
+    height: 100%;
+    overflow: auto;
 }
 
 #inspectorcontent label,
@@ -303,8 +289,7 @@ select {
 #inspectorcontent input[type=checkbox],
 #explorercontent input[type=checkbox] {
     margin: 7px;
-    position: absolute;
-    margin-left: 0;
+    float: right;
 }
 
 #inspectorcontent input[type=number],
@@ -325,7 +310,7 @@ select {
 }
 
 #sidecontainer {
-    height: calc(100vh - 44px);
+    height: calc(100dvh - 44px);
     overflow: auto;
     position: absolute;
 }
@@ -351,17 +336,23 @@ select {
         transform: scale3d(1, 1, 1);
     }
 
-    10%, 20% {
+    10%,
+    20% {
         -webkit-transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
         transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
     }
 
-    30%, 50%, 70%, 90% {
+    30%,
+    50%,
+    70%,
+    90% {
         -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
         transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
     }
 
-    40%, 60%, 80% {
+    40%,
+    60%,
+    80% {
         -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
         transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
     }
@@ -369,5 +360,76 @@ select {
     100% {
         -webkit-transform: scale3d(1, 1, 1);
         transform: scale3d(1, 1, 1);
+    }
+}
+
+@media (pointer:none),
+(pointer:coarse) {
+    #sidecontainer {
+        background-color: var(--qroui-base-color);
+        color: var(--qroui-base-text-color);
+        height: 44px;
+        bottom: 1px;
+        width: 100vw;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    #controls {
+        background-color: var(--qroui-base-color);
+        color: var(--qroui-base-text-color);
+        width: 100vw;
+        display: flex;
+        justify-content: space-around;
+    }
+
+    #sidebuttons {
+        width: fit-content;
+        float: none;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .separator {
+        padding: 0px !important;
+        rotate: 90deg !important;
+        width: 0px;
+        pointer-events: none !important;
+        background: none !important;
+    }
+
+    ::-webkit-scrollbar {
+        width: 2px !important;
+        height: 2px !important;
+    }
+
+    #sideButtons button {
+        font-size: 20px;
+        padding: 11px 12px 13px 12px;
+    }
+
+    #extra-desktop,
+    #extra-separator {
+        display: none !important;
+    }
+
+    .rightwing {
+        display: none;
+    }
+
+    #logobutton {
+        display: none;
+    }
+
+    #inspector,
+    #explorer {
+        width: 100vw !important;
+        height: 0dvh;
+    }
+
+    .dropdown-content {
+        width: 100vw;
+        left: 0;
+        animation: none;
     }
 }

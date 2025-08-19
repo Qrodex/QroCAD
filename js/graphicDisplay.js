@@ -244,8 +244,8 @@ GraphicDisplay.prototype.clearGrid = function (e) {
 	this.context.save();
 
 	this.context.translate(this.displayWidth / 2, this.displayHeight / 2);
-	this.context.strokeStyle = "#666";
-	this.context.lineWidth = 0.15;
+	this.context.strokeStyle = "#363535";
+	this.context.lineWidth = 1;
 };
 
 GraphicDisplay.prototype.drawAllComponents = function (components, moveByX, moveByY) {
@@ -915,7 +915,8 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 				if (this.selectedComponent == null) {
 					this.temporarySelectedComponent = this.findIntersectionWith(
 						this.getCursorXLocal(),
-						this.getCursorYLocal());
+						this.getCursorYLocal()
+					);
 				} else {
 					this.moveComponent(
 						this.selectedComponent,
@@ -947,11 +948,20 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 					if (this.temporarySelectedComponent != null) {
 						closeExplorer()
 						inspectorMenu.style.transition = "all 0.1s ease";
-						inspectorMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
-						inspectorMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
-						inspectorMenu.style.width = "25vw";
 						inspectorMenu.style.borderWidth = "1px";
 						componentProperties.innerHTML = "";
+
+						if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
+							inspectorMenu.style.bottom = document.getElementById("sidecontainer").getBoundingClientRect().height;
+							inspectorMenu.style.width = "100vw";
+							inspectorMenu.style.marginLeft = "0px";
+							inspectorMenu.style.height = `calc(75dvh - ${document.getElementById("controls").getBoundingClientRect().height}px - ${document.getElementById("sidecontainer").getBoundingClientRect().height}px)`;
+						} else {
+							inspectorMenu.style.bottom = false;
+							inspectorMenu.style.width = "25vw";
+							inspectorMenu.style.marginLeft = document.getElementById("sidecontainer").getBoundingClientRect().width;
+							inspectorMenu.style.height = `calc(100dvh - ${document.getElementById("controls").getBoundingClientRect().height}px)`;
+						}
 
 						var elemType = Object.keys(COMPONENT_TYPES).find(key => COMPONENT_TYPES[key] === gd.logicDisplay.components[this.selectedComponent]["type"]);
 						let title = document.createElement('h3');
@@ -967,9 +977,15 @@ GraphicDisplay.prototype.performAction = async function (e, action) {
 				} else {
 					componentProperties.innerHTML = "";
 
-					inspectorMenu.style.transition = "all 0.1s ease";
-					inspectorMenu.style.width = "0vw"
-					inspectorMenu.style.borderWidth = "0px";
+					if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
+						inspectorMenu.style.transition = "all 0.1s ease";
+						inspectorMenu.style.height = "0dvh"
+						inspectorMenu.style.borderWidth = "0px";
+					} else {
+						inspectorMenu.style.transition = "all 0.1s ease";
+						inspectorMenu.style.width = "0vw"
+						inspectorMenu.style.borderWidth = "0px";
+					}
 
 					setTimeout(() => { inspectorMenu.style.transition = "none"; }, 100);
 
@@ -1111,7 +1127,7 @@ GraphicDisplay.prototype.setZoom = function (zoomFactor) {
 	var newZoom = this.currentZoom * zoomFactor;
 
 	// Zoom interval control
-	if (newZoom <= 0.4 || newZoom >= 4)
+	if (newZoom <= 0.1 || newZoom >= 10)
 		return;
 
 	this.targetZoom = newZoom;
@@ -1166,6 +1182,7 @@ GraphicDisplay.prototype.getCursorYInFrame = function (e) {
 	}
 };
 
+// Tooltip
 GraphicDisplay.prototype.setToolTip = async function (text) {
 	this.tooltip = await translateOrLoadFromCache(text, prefLang);
 };
@@ -1182,37 +1199,114 @@ GraphicDisplay.prototype.getToolTip = function () {
 	return text;
 };
 
-//TODO: Move in Utils.
+// Object Selection
 GraphicDisplay.prototype.getDistance = function (x1, y1, x2, y2) {
 	var distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 
 	return distance.toFixed(2);
 };
 
-// TODO: Move in Utils.
-GraphicDisplay.prototype.findIntersectionWith = function (x, y) {
-	for (var i = this.logicDisplay.components.length - 1; i >= 0; i--) {
-		if (!this.logicDisplay.components[i].isActive())
-			continue;
+GraphicDisplay.prototype.isPointNearLine = function (px, py, x1, y1, x2, y2, tolerance) {
+	const lineLength = this.getDistance(x1, y1, x2, y2);
+	if (lineLength === 0) return false;
 
-		switch (this.logicDisplay.components[i].type) {
-			case COMPONENT_TYPES.POINT:
-			case COMPONENT_TYPES.LABEL:
-			case COMPONENT_TYPES.PICTURE:
-			case COMPONENT_TYPES.ARC:
-			case COMPONENT_TYPES.SHAPE:
-				var delta = this.getDistance(x, y, this.logicDisplay.components[i].x, this.logicDisplay.components[i].y);
-				if (delta >= 0 && delta <= this.snapTolerance / this.zoom)
-					return i;
-				break;
-			case COMPONENT_TYPES.LINE:
-			case COMPONENT_TYPES.CIRCLE:
-			case COMPONENT_TYPES.RECTANGLE:
-			case COMPONENT_TYPES.MEASURE:
-				var delta = this.getDistance(x, y, this.logicDisplay.components[i].x1, this.logicDisplay.components[i].y1);
-				if (delta >= 0 && delta <= this.snapTolerance / this.zoom)
-					return i;
-				break;
+	const distance = Math.abs((x2 - x1) * (y1 - py) - (x1 - px) * (y2 - y1)) / lineLength;
+	return distance <= tolerance;
+};
+
+GraphicDisplay.prototype.isPointInRectangle = function (px, py, x1, y1, x2, y2) {
+	const minX = Math.min(x1, x2);
+	const maxX = Math.max(x1, x2);
+	const minY = Math.min(y1, y2);
+	const maxY = Math.max(y1, y2);
+
+	return px >= minX && px <= maxX && py >= minY && py <= maxY;
+};
+
+GraphicDisplay.prototype.isPointNearArc = function (px, py, cx, cy, x1, y1, x2, y2, tolerance) {
+	const radius = this.getDistance(cx, cy, x1, y1);
+	const distanceToCenter = this.getDistance(px, py, cx, cy);
+
+	if (Math.abs(distanceToCenter - radius) > tolerance) return false;
+
+	const angle1 = this.getAngle(cx, cy, x1, y1);
+	const angle2 = this.getAngle(cx, cy, x2, y2);
+	const pointAngle = this.getAngle(cx, cy, px, py);
+
+	return pointAngle >= Math.min(angle1, angle2) && pointAngle <= Math.max(angle1, angle2);
+};
+
+GraphicDisplay.prototype.findIntersectionWith = function (x, y) {
+	const expandedTolerance = this.snapTolerance / this.zoom * 1.5;
+
+	for (var i = this.logicDisplay.components.length - 1; i >= 0; i--) {
+		const component = this.logicDisplay.components[i];
+		if (!component.isActive()) continue;
+
+		if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
+			switch (component.type) {
+				case COMPONENT_TYPES.POINT:
+				case COMPONENT_TYPES.LABEL:
+				case COMPONENT_TYPES.PICTURE:
+				case COMPONENT_TYPES.SHAPE:
+					var delta = this.getDistance(x, y, component.x, component.y);
+					if (delta >= 0 && delta <= expandedTolerance) {
+						return i;
+					}
+					break;
+
+				case COMPONENT_TYPES.LINE:
+					if (this.isPointNearLine(x, y, component.x1, component.y1, component.x2, component.y2, expandedTolerance)) {
+						return i;
+					}
+					break;
+
+				case COMPONENT_TYPES.CIRCLE:
+					var distanceToCenter = this.getDistance(x, y, component.x1, component.y1);
+					var radius = this.getDistance(component.x1, component.y1, component.x2, component.y2);
+					if (Math.abs(distanceToCenter - radius) <= expandedTolerance) {
+						return i;
+					}
+					break;
+
+				case COMPONENT_TYPES.RECTANGLE:
+					if (this.isPointInRectangle(x, y, component.x1, component.y1, component.x2, component.y2)) {
+						return i;
+					}
+					break;
+
+				case COMPONENT_TYPES.ARC:
+					if (this.isPointNearArc(x, y, component.x1, component.y1, component.x2, component.y2, component.x3, component.y3, expandedTolerance)) {
+						return i;
+					}
+					break;
+
+				case COMPONENT_TYPES.MEASURE:
+					if (this.isPointNearLine(x, y, component.x1, component.y1, component.x2, component.y2, expandedTolerance)) {
+						return i;
+					}
+					break;
+			}
+		} else {
+			switch (this.logicDisplay.components[i].type) {
+				case COMPONENT_TYPES.POINT:
+				case COMPONENT_TYPES.LABEL:
+				case COMPONENT_TYPES.PICTURE:
+				case COMPONENT_TYPES.ARC:
+				case COMPONENT_TYPES.SHAPE:
+					var delta = this.getDistance(x, y, this.logicDisplay.components[i].x, this.logicDisplay.components[i].y);
+					if (delta >= 0 && delta <= expandedTolerance)
+						return i;
+					break;
+				case COMPONENT_TYPES.LINE:
+				case COMPONENT_TYPES.CIRCLE:
+				case COMPONENT_TYPES.RECTANGLE:
+				case COMPONENT_TYPES.MEASURE:
+					var delta = this.getDistance(x, y, this.logicDisplay.components[i].x1, this.logicDisplay.components[i].y1);
+					if (delta >= 0 && delta <= expandedTolerance)
+						return i;
+					break;
+			}
 		}
 	}
 
@@ -1262,7 +1356,7 @@ var initCAD = function (gd) {
 	});
 
 	gd.cvn.mousedown(function (e) {
-		closeExplorer()
+		closeExplorer();
 		if (gd.mode != gd.MODES.MOVE) {
 			if (inspectorMenu.style.width != "0vw") gd.clickOut = true;
 			gd.unselectComponent();
@@ -1282,42 +1376,90 @@ var initCAD = function (gd) {
 	});
 
 	gd.cvn.on('wheel', (event) => {
-		let zoomFactor = 1
 		if (event.originalEvent.deltaY < 0) {
-			gd.zoomIn()
+			gd.zoomIn();
 		} else {
-			gd.zoomOut()
+			gd.zoomOut();
 		}
 		event.preventDefault();
 	});
 
-	//handle mouse zooming
-	function zoomCanvas(e) {
-		if (e.ctrlKey) {
-			e.preventDefault()
-			if (e.deltaY < 0) {
-				gd.zoomIn();
-			} else {
-				gd.zoomOut();
-			}
-		}
-	}
-	gd.cvn[0].addEventListener('wheel', zoomCanvas);
+	// Bind Touch Events
+	let lastTouchDistance = null;
 
-	var lastSecond = Date.now()
-	var fps = 0
+	gd.cvn[0].addEventListener('touchstart', function (e) {
+		e.preventDefault();
+
+		const touch = e.touches[0];
+		gd.mouse.cursorXGlobal = touch.clientX;
+		gd.mouse.cursorYGlobal = touch.clientY;
+
+		if (e.touches.length === 1) {
+			gd.performAction(e, gd.MOUSEACTION.DOWN);
+		}
+	});
+
+	gd.cvn[0].addEventListener('touchmove', function (e) {
+		e.preventDefault();
+
+		if (e.touches.length === 1) {
+			const touch = e.touches[0];
+			gd.mouse.cursorXGlobal = touch.clientX;
+			gd.mouse.cursorYGlobal = touch.clientY;
+			gd.gridPointer = false;
+			gd.performAction(e, gd.MOUSEACTION.MOVE);
+		} else if (e.touches.length === 2) {
+			const touch1 = e.touches[0];
+			const touch2 = e.touches[1];
+
+			const currentDistance = Math.sqrt(
+				Math.pow(touch2.clientX - touch1.clientX, 2) +
+				Math.pow(touch2.clientY - touch1.clientY, 2)
+			);
+
+			if (lastTouchDistance) {
+				const zoomSensitivity = 0.01;
+				const zoomDelta = (currentDistance - lastTouchDistance) * zoomSensitivity;
+
+				if (zoomDelta > 0) {
+					gd.setZoom(1 + zoomDelta);
+				} else {
+					gd.setZoom(1 + zoomDelta);
+				}
+			}
+
+			lastTouchDistance = currentDistance;
+		} else {
+			lastTouchDistance = null;
+		}
+	});
+
+	gd.cvn[0].addEventListener('touchend', function (e) {
+		e.preventDefault();
+
+		if (e.touches.length === 0) {
+			gd.performAction(e, gd.MOUSEACTION.UP);
+		}
+
+		if (e.touches.length < 2) {
+			lastTouchDistance = null;
+		}
+	});
+
+	var lastSecond = Date.now();
+	var fps = 0;
 
 	// Start CAD
 	setInterval(function () {
-		var time = Date.now()
+		var time = Date.now();
 		if (time - lastSecond > 1000) {
-			globalfps = fps
-			fps = 0
-			lastSecond = time
+			globalfps = fps;
+			fps = 0;
+			lastSecond = time;
 		} else {
-			fps += 1
+			fps += 1;
 		}
 
 		gd.execute();
-	}, 0);
+	});
 };

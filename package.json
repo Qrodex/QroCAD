@@ -1,6 +1,6 @@
 {
   "name": "qrocad-desktop",
-  "version": "1.8.4",
+  "version": "2.0.0",
   "description": "The most insane, life-changing computer-aided design application on the web",
   "main": "index.js",
   "scripts": {

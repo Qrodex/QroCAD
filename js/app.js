@@ -50,11 +50,20 @@ async function openInspector() {
     closeExplorer()
 
     inspectorMenu.style.transition = "all 0.1s ease";
-    inspectorMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
-    inspectorMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
-    inspectorMenu.style.width = "25vw";
     inspectorMenu.style.borderWidth = "1px";
     componentProperties.innerHTML = "";
+
+    if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
+        inspectorMenu.style.bottom = document.getElementById("sidecontainer").getBoundingClientRect().height;
+        inspectorMenu.style.width = "100vw";
+        inspectorMenu.style.marginLeft = "0px";
+        inspectorMenu.style.height = `calc(75dvh - ${document.getElementById("controls").getBoundingClientRect().height}px - ${document.getElementById("sidecontainer").getBoundingClientRect().height}px)`;
+    } else {
+        inspectorMenu.style.bottom = false;
+        inspectorMenu.style.width = "25vw";
+        inspectorMenu.style.marginLeft = document.getElementById("sidecontainer").getBoundingClientRect().width;
+        inspectorMenu.style.height = `calc(100dvh - ${document.getElementById("controls").getBoundingClientRect().height}px)`;
+    }
 
     var elemType = Object.keys(COMPONENT_TYPES).find(key => COMPONENT_TYPES[key] === gd.logicDisplay.components[gd.selectedComponent]["type"]);
     let title = document.createElement('h3');
@@ -70,9 +79,15 @@ async function openInspector() {
 function closeInspector() {
     componentProperties.innerHTML = "";
 
-    inspectorMenu.style.transition = "all 0.1s ease";
-    inspectorMenu.style.width = "0vw"
-    inspectorMenu.style.borderWidth = "0px";
+    if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
+        inspectorMenu.style.transition = "all 0.1s ease";
+        inspectorMenu.style.height = "0dvh"
+        inspectorMenu.style.borderWidth = "0px";
+    } else {
+        inspectorMenu.style.transition = "all 0.1s ease";
+        inspectorMenu.style.width = "0vw"
+        inspectorMenu.style.borderWidth = "0px";
+    }
 
     setTimeout(() => { inspectorMenu.style.transition = "none"; }, 100);
 
@@ -82,9 +97,15 @@ function closeInspector() {
 function closeExplorer() {
     componentProperties.innerHTML = "";
 
-    explorerMenu.style.transition = "all 0.1s ease";
-    explorerMenu.style.width = "0vw"
-    explorerMenu.style.borderWidth = "0px";
+    if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
+        explorerMenu.style.transition = "all 0.1s ease";
+        explorerMenu.style.height = "0dvh"
+        explorerMenu.style.borderWidth = "0px";
+    } else {
+        explorerMenu.style.transition = "all 0.1s ease";
+        explorerMenu.style.width = "0vw"
+        explorerMenu.style.borderWidth = "0px";
+    }
 
     setTimeout(() => { explorerMenu.style.transition = "none"; }, 100);
 }
@@ -131,11 +152,6 @@ var explorerMenu = document.getElementById("explorer")
 var explorerList = document.getElementById("explorercontent")
 var inspectorMenu = document.getElementById("inspector")
 var componentProperties = document.getElementById("inspectorcontent")
-
-inspectorMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
-inspectorMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
-explorerMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
-explorerMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
 
 var versionspan = document.getElementById("spanversion")
 async function setVersionManual() {
@@ -209,21 +225,6 @@ function doInspectObject() {
 //main app
 var gd
 $(document).ready(function () {
-    var things = ''
-    let i = 0
-    var loaderLoop = setInterval(function () {
-        i++
-        if (i < things.length) {
-            try {
-                document.getElementById("activationProgress").innerText = things[i]
-            } catch (error) {
-                clearInterval(loaderLoop)
-            }
-        } else {
-            i = 0
-        }
-    }, 30)
-
     var loadingTime
     if (isElectron()) {
         loadingTime = 500
@@ -237,9 +238,20 @@ $(document).ready(function () {
         document.getElementById("languages").value = localStorage.getItem("prefLang") || "default";
         var prevWidth = 0
         var prevHeight = 0
+
         function resizeCanvas() {
-            let currWidth = (window.innerWidth - document.getElementById('sideButtons').getBoundingClientRect().width) - 2
-            let currHeight = (window.innerHeight - document.getElementById('controls').getBoundingClientRect().height) - 1
+            let sideButtonsWidth = document.getElementById('sideButtons').getBoundingClientRect().width
+            let sideContainerHeight = document.getElementById('sidecontainer').getBoundingClientRect().height
+            let controlsHeight = document.getElementById('controls').getBoundingClientRect().height
+            let currWidth = window.innerWidth - (sideButtonsWidth + 2)
+            let currHeight = window.innerHeight - (controlsHeight + 1)
+
+            if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
+                currWidth = window.screen.width
+                currHeight = window.screen.height - (controlsHeight + sideContainerHeight + 1)
+            } else {
+                document.getElementById("CADCanvas").style.marginTop = 0
+            }
 
             if ((currHeight != prevHeight) || (currWidth != prevWidth)) {
                 prevWidth = currWidth
@@ -351,14 +363,24 @@ $(document).ready(function () {
         $("#query_new").click(newProject)
 
         function openExplorer() {
-            if (explorerMenu.style.width == "0vw") {
+            if (document.getElementById("inspector").style.width == '25vw' || (document.getElementById("inspector").style.height != '0dvh' && window.matchMedia('(pointer: none), (pointer: coarse)').matches)) {
                 closeInspector()
+            } else if (explorerMenu.style.width == "0vw" || explorerMenu.style.height == "0dvh") {
                 explorerMenu.style.transition = "all 0.1s ease";
-                explorerMenu.style.marginLeft = document.getElementById("sideButtons").getBoundingClientRect().width;
-                explorerMenu.style.height = `calc(100vh - ${document.getElementById("closeApp").getBoundingClientRect().height}px)`;
-                explorerMenu.style.width = "25vw";
                 explorerMenu.style.borderWidth = "1px";
                 explorerList.innerHTML = "<h3>Explorer</h3>";
+
+                if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
+                    explorerMenu.style.bottom = document.getElementById("sidecontainer").getBoundingClientRect().height;
+                    explorerMenu.style.width = "100vw";
+                    explorerMenu.style.marginLeft = "0px";
+                    explorerMenu.style.height = `calc(75dvh - ${document.getElementById("controls").getBoundingClientRect().height}px - ${document.getElementById("sidecontainer").getBoundingClientRect().height}px)`;
+                } else {
+                    explorerMenu.style.bottom = false;
+                    explorerMenu.style.width = "25vw";
+                    explorerMenu.style.marginLeft = document.getElementById("sidecontainer").getBoundingClientRect().width;
+                    explorerMenu.style.height = `calc(100dvh - ${document.getElementById("controls").getBoundingClientRect().height}px)`;
+                }
 
                 const explorercontent = document.getElementById("explorercontent")
 
@@ -538,7 +560,6 @@ $(document).ready(function () {
     } else {
         document.getElementById("extra-separator").style.display = "none"
         document.getElementById("extra-desktop").style.display = "none"
-        document.getElementById("activationProgress").style.display = "none"
         document.getElementById("gd_save").style.display = "block"
         document.getElementById("gd_download").style.display = "none"
 
