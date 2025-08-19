@@ -247,11 +247,12 @@ ul input {
 }
 
 input[type=checkbox] {
-    min-width: 13px;
+    min-width: 19px;
     margin: 0;
-    margin-top: 3px;
     accent-color: var(--qroui-button-active-color);
     cursor: pointer;
+    aspect-ratio: 1/1;
+    margin-top: -1px;
 }
 
 select {
